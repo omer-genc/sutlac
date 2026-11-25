@@ -1,0 +1,4 @@
+# HTML import'la paketlenen arayüzde Tailwind (yalnız `bun run dev`; yayında build.ts paketler).
+# Bun bunfig'i çalıştığı klasörden okur; geliştirme sunucusu bu klasörde başlatılmalı.
+[serve.static]
+plugins = ["bun-plugin-tailwind"]

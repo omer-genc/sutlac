@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+.env*.local
+
+# Claude Code kişisel ayarları ve çalışma alanları
+.claude/settings.local.json
+.claude/worktrees/
+.worktrees/
+
+# Worktree durumu (rapor): alt oturum yazar, ana oturum /is-topla ile okur
+.worktree/

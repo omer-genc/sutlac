@@ -1,0 +1,11 @@
+{
+  "name": "@sutlac/site",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun ./index.html --port 4500",
+    "build": "bun build ./index.html --outdir dist --minify",
+    "typecheck": "true"
+  }
+}

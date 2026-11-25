@@ -1,0 +1,11 @@
+{
+  "name": "sutlac",
+  "owner": { "name": "sutlac" },
+  "plugins": [
+    {
+      "name": "sutlac",
+      "source": "./packages/sutlac",
+      "description": "Repodaki docs/ klasöründe iş takibi: iş açma, başlatma, paralel oturumlara dağıtma, toplama ve kapatma skill'leri."
+    }
+  ]
+}

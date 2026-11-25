@@ -1,0 +1,19 @@
+{
+  "name": "sutlac-monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "cd packages/sutlac && bun run dev --",
+    "docs": "cd packages/sutlac && bun run dev -- --dir ../../docs",
+    "dev:site": "bun --filter @sutlac/site dev",
+    "build": "bun --filter '*' build",
+    "typecheck": "bun --filter '*' typecheck",
+    "test": "bun --filter sutlac test",
+    "docs:check": "bun packages/sutlac/src/cli.ts check",
+    "check": "bun run docs:check && bun run typecheck && bun run test"
+  },
+  "packageManager": "bun@1.4.4"
+}

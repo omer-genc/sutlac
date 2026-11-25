@@ -1,0 +1,67 @@
+{
+  "title": "Sütlaç",
+  "prefix": "SUT",
+  "tags": [],
+  "statuses": [
+    {
+      "id": "todo",
+      "label": "Todo",
+      "color": "blue",
+      "closed": false,
+      "board": true
+    },
+    {
+      "id": "in-progress",
+      "label": "In Progress",
+      "color": "amber",
+      "closed": false,
+      "board": true
+    },
+    {
+      "id": "review",
+      "label": "Review / Test",
+      "color": "purple",
+      "closed": false,
+      "board": true
+    },
+    {
+      "id": "blocked",
+      "label": "Blocked",
+      "color": "red",
+      "closed": false,
+      "board": true
+    },
+    {
+      "id": "done",
+      "label": "Done",
+      "color": "green",
+      "closed": true,
+      "board": true
+    },
+    {
+      "id": "cancelled",
+      "label": "İptal",
+      "color": "gray",
+      "closed": true,
+      "board": false
+    }
+  ],
+  "priorities": [
+    {
+      "id": "high",
+      "label": "High",
+      "color": "orange"
+    },
+    {
+      "id": "normal",
+      "label": "Normal",
+      "color": "blue"
+    },
+    {
+      "id": "low",
+      "label": "Low",
+      "color": "gray"
+    }
+  ],
+  "fields": []
+}

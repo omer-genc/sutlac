@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "docs",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["packages/sutlac/src/cli.ts", "--no-open", "--port", "4400"],
+      "port": 4400
+    },
+    {
+      "name": "site",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["--filter", "@sutlac/site", "dev"],
+      "port": 4500
+    }
+  ]
+}

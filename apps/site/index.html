@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Sütlaç · repodaki docs/ klasöründe iş takibi</title>
+    <meta name="description" content="İşler, sprintler ve kararlar repodaki markdown dosyalarıdır. Sütlaç onlara yerel bir board, bir komut satırı ve Claude Code skill'leri ekler." />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="top">
+      <a class="brand" href="#top" aria-label="Sütlaç ana sayfa"><span class="bowl" aria-hidden="true"></span>sütlaç</a>
+      <nav aria-label="Bölümler">
+        <a href="#kurulum">Kurulum</a>
+        <a href="#akis">Skill'ler</a>
+        <a href="#komutlar">Komutlar</a>
+        <a href="#dosyalar">Dosya biçimi</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <p class="eyebrow">Dış araç yok · MCP yok · yalnız markdown</p>
+        <h1>İş takibi, repodaki <code>docs/</code> klasöründe.</h1>
+        <p class="lead">
+          Her iş bir <code>.md</code> dosyasıdır; kodla aynı commit'e girer, aynı dalda gezer, <code>grep</code> ile aranır. Sütlaç bu klasöre yerel bir board, bir komut satırı ve
+          işi açan, dağıtan, toplayan, kapatan Claude Code skill'leri ekler.
+        </p>
+        <pre class="cmd" aria-label="Hızlı başlangıç"><code><span class="p">$</span> bunx sutlac init --prefix KES
+<span class="p">$</span> bunx sutlac</code></pre>
+
+        <div class="board" role="img" aria-label="Board örneği: Todo, In Progress, Review ve Done kolonlarında iş kartları">
+          <div class="col">
+            <h3><i class="dot blue"></i>Todo <b>2</b></h3>
+            <div class="card"><small>KES-146 · <em class="hi">high</em></small>Sipariş detayında kalemler listelenmiyor<span class="tag teal">mobile</span></div>
+            <div class="card"><small>KES-151</small>Liste uçlarına günlük önbellek<span class="tag purple">api</span></div>
+          </div>
+          <div class="col">
+            <h3><i class="dot amber"></i>In Progress <b>1</b></h3>
+            <div class="card"><small>KES-120</small>Sipariş durumu yanlış görünüyor<span class="tag teal">mobile</span><span class="tag purple">api</span></div>
+          </div>
+          <div class="col">
+            <h3><i class="dot purple"></i>Review <b>1</b></h3>
+            <div class="card"><small>KES-98 · 💬 2</small>Şube kullanıcısı yalnız kendi siparişlerini görür<span class="tag orange">web</span></div>
+          </div>
+          <div class="col">
+            <h3><i class="dot green"></i>Done <b>1</b></h3>
+            <div class="card done"><small>KES-87</small>Giriş hız sınırı<span class="tag purple">api</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="three">
+        <article>
+          <h2>Arayüz</h2>
+          <p>Board, backlog, sprintler, arşiv ve doküman ağacı. Kart sürüklemek <code>status</code> alanını yazar; editör yalnız değişen bloğu yeniden yazar, dosyanın geri kalanı elle yazıldığı gibi kalır.</p>
+        </article>
+        <article>
+          <h2>Komut satırı</h2>
+          <p><code>list</code>, <code>next</code>, <code>check</code>: agent'ın da insanın da aynı cevabı tek satırda aldığı küçük komutlar. Çalışma anında bağımlılık yok, yalnız Bun.</p>
+        </article>
+        <article>
+          <h2>Skill'ler</h2>
+          <p>Altı skill işin bütün ömrünü taşır: arayıp açmak, üstlenmek, paralel oturumlara dağıtmak, worktree'de yapmak, toplayıp main'e almak, kanıtla kapatmak.</p>
+        </article>
+      </section>
+
+      <section id="kurulum">
+        <h2>Kurulum</h2>
+        <ol class="steps">
+          <li>
+            <h3>Klasörü kur</h3>
+            <p>Repo kökünde çalıştır. <code>docs/config.json</code>, biçim belgeleri ve boş klasörler oluşur; var olan dosyaya dokunmaz.</p>
+            <pre><code>bun add -d sutlac
+bunx sutlac init --prefix KES --title "Keskin Docs"</code></pre>
+          </li>
+          <li>
+            <h3>Skill'leri ekle</h3>
+            <p>Claude Code eklentisi olarak (skill'ler <code>/sutlac:is-ac</code> diye görünür, hook'lar kendiliğinden gelir):</p>
+            <pre><code>/plugin marketplace add &lt;github-kullanıcı&gt;/sutlac
+/plugin install sutlac@sutlac</code></pre>
+            <p>ya da dosyaları repoya kopyalayarak (<code>.claude/skills/</code>, <code>.claude/hooks/sutlac/</code>, <code>settings.json</code>):</p>
+            <pre><code>bunx sutlac skills</code></pre>
+          </li>
+          <li>
+            <h3>Projeyi tanıt</h3>
+            <p>Skill'ler projeye özgü hiçbir şeyi ezbere bilmez. Kök <code>CLAUDE.md</code>'ye kontrol komutunu (ör. <code>bun run check</code>), commit biçimini ve varsa paralel çalışma kurallarını yaz; oradan okurlar.</p>
+          </li>
+        </ol>
+      </section>
+
+      <section id="akis">
+        <h2>Bir işin ömrü</h2>
+        <p class="sub">Ana oturum planlar, karar verir ve <code>docs/</code>'u yalnız o yazar. Alt oturumlar kendi worktree'lerinde yalnız işi yapar ve rapor bırakır.</p>
+        <ol class="flow">
+          <li><code>/is-ac</code><b>Aç</b><span>Önce mevcut işlerde arar; eşleşme varsa yeni iş açmaz. Davranışı ürün diliyle, gözlenebilir Kabul maddeleriyle yazar.</span></li>
+          <li><code>/is-baslat</code><b>Başlat</b><span>Aktif sprinti ve backlog'u özetler, seçilen işi <code>in-progress</code>'e alır, kodu okuyup ne yapacağını anlatır.</span></li>
+          <li><code>/is-dagit</code><b>Dağıt</b><span>Birbirine dokunmayan işleri çakışma kontrolünden geçirip her biri için ayrı worktree oturumu başlatır.</span></li>
+          <li><code>/is-yap</code><b>Yap</b><span>Alt oturumda: kendi dalında geliştirir, dener, commit atar; kanıtı ve bulduğu hataları <code>.worktree/rapor.md</code>'ye yazar.</span></li>
+          <li><code>/is-topla</code><b>Topla</b><span>Raporu diff'e karşı denetler, onayla main'e alır, kontrolleri çalıştırır, rapordaki bulguları iş olarak açar.</span></li>
+          <li><code>/is-kapat</code><b>Kapat</b><span>Her Kabul maddesi için kanıt ister. Gerçek ortamda denenmesi kalan iş <code>done</code> değil <code>review</code> olur.</span></li>
+        </ol>
+      </section>
+
+      <section id="komutlar">
+        <h2>Komutlar</h2>
+        <div class="table">
+          <table>
+            <thead><tr><th scope="col">Komut</th><th scope="col">Ne yapar</th></tr></thead>
+            <tbody>
+              <tr><td><code>sutlac</code></td><td>Arayüzü açar. <code>--port 4400</code>, <code>--no-open</code>, <code>--dir &lt;docs&gt;</code></td></tr>
+              <tr><td><code>sutlac init</code></td><td><code>docs/</code> iskeletini kurar. <code>--prefix</code>, <code>--title</code>, <code>--dir</code></td></tr>
+              <tr><td><code>sutlac list</code></td><td>Açık işler, satır başına bir iş. <code>--all</code>, <code>--tag</code>, <code>--json</code></td></tr>
+              <tr><td><code>sutlac next</code></td><td>Sıradaki iş numarası</td></tr>
+              <tr><td><code>sutlac check</code></td><td>Belgelerde (CLAUDE.md, skill, agent, knowledge) geçen yollar ve resim bağlantıları repoda mı</td></tr>
+              <tr><td><code>sutlac skills</code></td><td>Skill ve hook'ları <code>.claude/</code> altına kopyalar. <code>--no-hooks</code>, <code>--to</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <pre><code><span class="p">$</span> bunx sutlac list
+# aktif sprint: 3 Sprint 3 — Ödeme akışı
+# iş|durum|öncelik|etiketler|sprint|başlık|yorum sayısı|son yorum
+KES-120|in-progress|normal|mobile,api|3|Sipariş durumu yanlış görünüyor|0|
+KES-98|review|normal|web|3|Şube kullanıcısı yalnız kendi siparişlerini görür|2|2026-01-15 21:30</code></pre>
+      </section>
+
+      <section id="dosyalar">
+        <h2>Dosya biçimi</h2>
+        <div class="split">
+          <pre><code>docs/
+├─ config.json     önek, etiketler, durumlar
+├─ tasks/          KES-1.md, KES-2.md …
+├─ sprints/        sprint-1.md …
+├─ knowledge/      kalıcı bilgi
+├─ decisions/      0001-kisa-baslik.md
+└─ images/         &lt;içerik özeti&gt;.png</code></pre>
+          <pre><code>---
+id: KES-12
+title: Sipariş listesi şube kapsamını uygulamıyor
+status: todo
+tags: [api, web]
+priority: normal
+sprint: 3
+created: 2026-01-15
+closed:
+---
+
+## Bağlam
+## Kabul
+1. Şube kullanıcısı yalnız kendi şubesini görür.
+
+## Yorumlar
+### 2026-01-15 21:30
+Kapanış notu, kanıtlarıyla.</code></pre>
+        </div>
+        <p class="sub">İşin yeri hiç değişmez; biten iş de yerinde kalır, böylece <code>KES-12</code> atıfları kırılmaz. Arşiv hesaplanır, dosya taşınmaz.</p>
+      </section>
+    </main>
+
+    <footer>
+      <span>sütlaç · MIT</span>
+      <span>Bun ile çalışır</span>
+    </footer>
+  </body>
+</html>
