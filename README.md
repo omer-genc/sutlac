@@ -35,7 +35,7 @@ The package has no runtime dependencies; it only needs [Bun](https://bun.sh). To
 | `sutlac init` | Creates the `docs/` skeleton (`--prefix`, `--title`, `--dir`) |
 | `sutlac list` | Open tasks, one per line (`--all`, `--tag`, `--json`) |
 | `sutlac next` | Next task number |
-| `sutlac check` | Verifies that paths and image links mentioned in your docs exist in the repo |
+| `sutlac check` | Verifies that paths and image links mentioned in your docs exist in the repo. In a monorepo, a folder with its own `CLAUDE.md` is a sub-project: a relative path such as `src/x.ts` resolves against the sub-project the doc belongs to or is talking about. Paths into git-ignored folders are skipped; list intentional exceptions in `docs/.checkignore` |
 | `sutlac skills` | Copies the skills and hooks into `.claude/` (`--no-hooks`, `--to`) |
 
 ### Skills
