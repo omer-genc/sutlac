@@ -26,4 +26,4 @@ The skills (`task-open`, `task-start`, `task-dispatch`, `task-work`, `task-colle
 
 Section headings inside task files (`## Bağlam` context, `## Kabul` acceptance criteria, `## Yorumlar` comments) are part of the file format and are Turkish.
 
-More: https://github.com/omer-genc/sutlac
+More: https://sutlac.omergenc.net · https://github.com/omer-genc/sutlac

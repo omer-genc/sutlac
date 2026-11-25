@@ -1,0 +1,10 @@
+{
+  // Landing site: static files only (no Worker script). `bun run deploy` builds dist/ and uploads it.
+  "$schema": "https://unpkg.com/wrangler@4/config-schema.json",
+  "name": "sutlac-site",
+  "compatibility_date": "2026-11-01",
+  "account_id": "f98b25f680b17012cb6e88cb3ab1f73d",
+  "assets": { "directory": "./dist" },
+  "routes": [{ "pattern": "sutlac.omergenc.net", "custom_domain": true }],
+  "workers_dev": false
+}

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "bun ./index.html --port 4500",
     "build": "bun build ./index.html --outdir dist --minify",
-    "typecheck": "true"
+    "typecheck": "true",
+    "deploy": "bun run build && bunx wrangler deploy"
   }
 }

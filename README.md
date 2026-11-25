@@ -7,7 +7,7 @@ Turns the `docs/` folder in your repo into an issue tracker: every task, sprint 
 | Path | What |
 | --- | --- |
 | `packages/sutlac` | The package: CLI and server (`src/`), UI (React, bundled into `dist/` by `bun run build`), skills (`skills/`), hooks (`hooks/`), `sutlac init` templates (`templates/`). The same folder is the root of the Claude Code plugin (`.claude-plugin/plugin.json`) |
-| `apps/site` | Landing site: plain HTML + CSS, static output via `bun build` |
+| `apps/site` | Landing site at https://sutlac.omergenc.net: plain HTML + CSS, static output via `bun build`, deployed to Cloudflare Workers static assets with `bun --filter @sutlac/site deploy` |
 | `.claude-plugin/marketplace.json` | Makes this repo a plugin marketplace; the plugin points at `packages/sutlac` |
 | `docs/` | This repo's own tasks (prefix `SUT`); the package is used on itself |
 
