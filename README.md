@@ -36,7 +36,7 @@ Paket çalışma anında bağımlılık istemez; yalnız [Bun](https://bun.sh) g
 1. **Eklenti** (önerilen; güncelleme tek yerden, hook'lar kendiliğinden gelir). Skill'ler `/sutlac:is-ac` biçiminde adlanır:
 
    ```
-   /plugin marketplace add <github-kullanıcı>/sutlac
+   /plugin marketplace add omer-genc/sutlac
    /plugin install sutlac@sutlac
    ```
 

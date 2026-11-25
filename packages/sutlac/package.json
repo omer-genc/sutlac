@@ -4,6 +4,7 @@
   "description": "Repodaki docs/ klasörünü iş takibine çeviren yerel arayüz, komut satırı ve Claude Code skill'leri.",
   "type": "module",
   "license": "MIT",
+  "repository": { "type": "git", "url": "git+https://github.com/omer-genc/sutlac.git", "directory": "packages/sutlac" },
   "bin": {
     "sutlac": "src/cli.ts"
   },
