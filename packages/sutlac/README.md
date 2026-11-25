@@ -17,7 +17,7 @@ bunx sutlac                                            # UI on :4400
 | `sutlac check` | Verifies that paths and image links mentioned in your docs exist in the repo |
 | `sutlac skills` | Copies the skills and hooks into `.claude/` (`--no-hooks`, `--to`) |
 
-The skills (`is-ac`, `is-baslat`, `is-dagit`, `is-yap`, `is-topla`, `is-kapat`) cover a task's whole life: open, start, hand out to parallel worktree sessions, do, collect, close with evidence. They also install as a Claude Code plugin:
+The skills (`task-open`, `task-start`, `task-dispatch`, `task-work`, `task-collect`, `task-close`) cover a task's whole life: open, start, hand out to parallel worktree sessions, do, collect, close with evidence. They also install as a Claude Code plugin:
 
 ```
 /plugin marketplace add omer-genc/sutlac

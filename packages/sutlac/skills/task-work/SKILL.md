@@ -1,6 +1,6 @@
 ---
-name: is-yap
-description: Use in a sub-session (in a worktree) to do the single task the main session handed out with /is-dagit. Reads the task from the main checkout, develops it on its own branch, tries it, runs the checks, commits, and writes the result, the evidence and any bugs found to .worktree/rapor.md. Does not touch docs/.
+name: task-work
+description: Use in a sub-session (in a worktree) to do the single task the main session handed out with /task-dispatch. Reads the task from the main checkout, develops it on its own branch, tries it, runs the checks, commits, and writes the result, the evidence and any bugs found to .worktree/report.md. Does not touch docs/.
 argument-hint: "PREFIX-N"
 ---
 
@@ -15,7 +15,7 @@ git rev-parse --path-format=absolute --git-common-dir   # main checkout = the pa
 git branch --show-current
 ```
 
-If `.git` is a directory you are in the main checkout: stop, this skill does not run in the main checkout (use `/is-baslat` there). If the branch name is the project's main branch (`main`), stop: a sub-session works on its own branch.
+If `.git` is a directory you are in the main checkout: stop, this skill does not run in the main checkout (use `/task-start` there). If the branch name is the project's main branch (`main`), stop: a sub-session works on its own branch.
 
 If the project has a worktree setup (`scripts/worktree-setup.sh`; a hook runs it at session start), use the port and data information in its output. The `.worktree/` folder must exist for the report (`mkdir -p .worktree`; it does not go into git).
 
@@ -42,9 +42,9 @@ If the brief and the task file contradict each other, or a design decision is ne
 
 ## Step 4: Commit and report
 
-Committing is part of this skill (the user asked for it with `/is-dagit`): only to this branch, in the project's commit format (root `CLAUDE.md`), with `PREFIX-N` in the message. No push, do not touch main, do not rebase/merge (the main session does that with `/is-topla`).
+Committing is part of this skill (the user asked for it with `/task-dispatch`): only to this branch, in the project's commit format (root `CLAUDE.md`), with `PREFIX-N` in the message. No push, do not touch main, do not rebase/merge (the main session does that with `/task-collect`).
 
-Then write `.worktree/rapor.md` with this template (overwrite if it exists):
+Then write `.worktree/report.md` with this template (overwrite if it exists):
 
 ```md
 # PREFIX-N report
@@ -68,7 +68,7 @@ Two or three sentences: what changed, why this approach.
 None / <endpoint, field, behavior; which app or package, what should be done>
 
 ## Findings
-Task candidates; the main session searches and opens them with /is-ac. Each one:
+Task candidates; the main session searches and opens them with /task-open. Each one:
 ### <title sentence describing the behavior>
 - tags: <tags from docs/config.json>
 - Symptom: <in product language>
@@ -91,7 +91,7 @@ Keep the final message short; the first 400 characters reach the main session:
 
 ```
 PREFIX-N ready · branch <branch> · <n> commits · check ✓ · Acceptance ✓3 ⏳1 · findings 2
-Report: <absolute worktree path>/.worktree/rapor.md
+Report: <absolute worktree path>/.worktree/report.md
 ```
 
 Then stop. If the main session sends feedback (`SendMessage`), fix it, make a new commit, update the report.
@@ -101,4 +101,4 @@ Then stop. If the main session sends feedback (`SendMessage`), fix it, make a ne
 - docs/ and the root CLAUDE.md are not written; findings and suggestions go in the report.
 - No out-of-scope fixes; they are written as findings.
 - Own ports and data; no single-copy resources; no push; do not touch the main branch.
-- No ✓ without evidence (the same bar as `/is-kapat`).
+- No ✓ without evidence (the same bar as `/task-close`).

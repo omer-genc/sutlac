@@ -21,8 +21,8 @@ fi
 cat <<EOT
 This session runs in a worktree: it is a sub-session.
 - Main checkout: $main. Read task files from there: $main/docs/tasks/ (the copy in the worktree may be stale).
-- Do not write to docs/ or the root CLAUDE.md (the hook blocks it); task status, comments, new tasks, knowledge and decisions belong to the main session. Put findings and doc suggestions in .worktree/rapor.md (Findings / Doc suggestions).
-- Workflow: /is-yap <task number>.
+- Do not write to docs/ or the root CLAUDE.md (the hook blocks it); task status, comments, new tasks, knowledge and decisions belong to the main session. Put findings and doc suggestions in .worktree/report.md (Findings / Doc suggestions).
+- Workflow: /task-work <task number>.
 $setup_out
 EOT
 exit 0

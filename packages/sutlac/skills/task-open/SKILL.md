@@ -1,5 +1,5 @@
 ---
-name: is-ac
+name: task-open
 description: Use when opening a new task - when the user describes a bug or request, when a finding outside the current scope comes up during work, or when another area needs a notice. Searches existing tasks first and opens no new task if one matches; otherwise writes the task file under docs/tasks/ with durable text and observable acceptance criteria. On request, adds the design as a dated comment.
 argument-hint: "[short description, in your own words]"
 ---
@@ -96,11 +96,11 @@ Rejected options: ... (why)
 Criteria tests can't prove: ... (why)
 ```
 
-`/is-baslat` reads this comment and checks whether it still holds against the code.
+`/task-start` reads this comment and checks whether it still holds against the code.
 
 ## Asking questions
 
-The same rule in this skill and in `/is-baslat`:
+The same rule in this skill and in `/task-start`:
 
 - **Describe the situation before asking:** what is happening and for whom, where you found it (the result, not a search dump), what you plan to do, which questions remain open. A few sentences; a summary longer than one screen isn't doing its job.
 - **Ask only if these three are true together:** two readings lead to clearly different work, the repo (rule, convention, existing code) doesn't settle it, the wrong choice is expensive. Otherwise decide and record it.

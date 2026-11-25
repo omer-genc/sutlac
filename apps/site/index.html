@@ -77,7 +77,7 @@ bunx sutlac init --prefix KES --title "Project Docs"</code></pre>
           </li>
           <li>
             <h3>Add the skills</h3>
-            <p>As a Claude Code plugin (skills appear as <code>/sutlac:is-ac</code>, hooks come along):</p>
+            <p>As a Claude Code plugin (skills appear as <code>/sutlac:task-open</code>, hooks come along):</p>
             <pre><code>/plugin marketplace add omer-genc/sutlac
 /plugin install sutlac@sutlac</code></pre>
             <p>or by copying the files into the repo (<code>.claude/skills/</code>, <code>.claude/hooks/sutlac/</code>, <code>settings.json</code>):</p>
@@ -94,12 +94,12 @@ bunx sutlac init --prefix KES --title "Project Docs"</code></pre>
         <h2>The life of a task</h2>
         <p class="sub">The main session plans, decides and is the only one that writes <code>docs/</code>. Sub-sessions work in their own worktrees, do the task and leave a report.</p>
         <ol class="flow">
-          <li><code>/is-ac</code><b>Open</b><span>Searches existing tasks first and doesn't open a duplicate. Describes behaviour in product terms, with observable acceptance criteria.</span></li>
-          <li><code>/is-baslat</code><b>Start</b><span>Summarises the active sprint and backlog, moves the chosen task to <code>in-progress</code>, reads the code and says what it plans to do.</span></li>
-          <li><code>/is-dagit</code><b>Hand out</b><span>Checks that tasks don't overlap, then starts a separate worktree session for each one.</span></li>
-          <li><code>/is-yap</code><b>Do</b><span>In the sub-session: builds on its own branch, tests, commits, and writes evidence and any bugs it found to <code>.worktree/rapor.md</code>.</span></li>
-          <li><code>/is-topla</code><b>Collect</b><span>Checks the report against the diff, merges with your approval, runs the checks and files the report's findings as tasks.</span></li>
-          <li><code>/is-kapat</code><b>Close</b><span>Asks for evidence for every acceptance criterion. A task that still needs trying in a real environment becomes <code>review</code>, not <code>done</code>.</span></li>
+          <li><code>/task-open</code><b>Open</b><span>Searches existing tasks first and doesn't open a duplicate. Describes behaviour in product terms, with observable acceptance criteria.</span></li>
+          <li><code>/task-start</code><b>Start</b><span>Summarises the active sprint and backlog, moves the chosen task to <code>in-progress</code>, reads the code and says what it plans to do.</span></li>
+          <li><code>/task-dispatch</code><b>Hand out</b><span>Checks that tasks don't overlap, then starts a separate worktree session for each one.</span></li>
+          <li><code>/task-work</code><b>Do</b><span>In the sub-session: builds on its own branch, tests, commits, and writes evidence and any bugs it found to <code>.worktree/report.md</code>.</span></li>
+          <li><code>/task-collect</code><b>Collect</b><span>Checks the report against the diff, merges with your approval, runs the checks and files the report's findings as tasks.</span></li>
+          <li><code>/task-close</code><b>Close</b><span>Asks for evidence for every acceptance criterion. A task that still needs trying in a real environment becomes <code>review</code>, not <code>done</code>.</span></li>
         </ol>
       </section>
 

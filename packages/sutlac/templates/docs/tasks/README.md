@@ -67,8 +67,8 @@ grep -l '^sprint: 3$' {{DOCS}}/tasks/{{PREFIX}}-*.md              # tasks in Spr
 
 ## Rules
 
-- Before opening a task, existing tasks are searched; if there is a match, no new task is opened and the evidence is added there. `## Bağlam` (context) and `## Kabul` (acceptance criteria) describe the behaviour in product language; file paths and symbol names go stale and stay in `## Notlar` or in a comment. Details: `/is-ac`.
-- The Kabul section is a numbered list (not checkboxes); at closing each item is marked with evidence (`/is-kapat`).
+- Before opening a task, existing tasks are searched; if there is a match, no new task is opened and the evidence is added there. `## Bağlam` (context) and `## Kabul` (acceptance criteria) describe the behaviour in product language; file paths and symbol names go stale and stay in `## Notlar` or in a comment. Details: `/task-open`.
+- The Kabul section is a numbered list (not checkboxes); at closing each item is marked with evidence (`/task-close`).
 - A note that affects another area (app, package) answers three questions: **what changed**, **why it matters**, **what needs to be done**. "Not affected" is a valid answer; it is written in the note and that is that.
-- Status flow: `todo` → `in-progress` → `review` → `done`. `review`: the code is finished and committed, the checks are green; Kabul still has to be tried in the real environment or is waiting for the user's approval. Once the user has tried it they drag it to `done` on the board; if a problem turns up, the task goes back to `in-progress`. `/is-kapat` applies the rule.
+- Status flow: `todo` → `in-progress` → `review` → `done`. `review`: the code is finished and committed, the checks are green; Kabul still has to be tried in the real environment or is waiting for the user's approval. Once the user has tried it they drag it to `done` on the board; if a problem turns up, the task goes back to `in-progress`. `/task-close` applies the rule.
 - When a task is finished, `status: done` and the `closed` date are written (the UI writes the closing date itself). Lasting knowledge goes to `{{DOCS}}/knowledge/`, a decision made goes to `{{DOCS}}/decisions/`.

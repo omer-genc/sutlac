@@ -1,6 +1,6 @@
 ---
-name: is-topla
-description: Use in the main session when a sub-session has finished its task (or the user says "take / collect PREFIX-N"). Inspects the sub-session's report and branch, brings it into main with the user's approval, runs the checks, closes the task with /is-kapat, opens the bugs in the report as tasks with /is-ac, and cleans up the worktree.
+name: task-collect
+description: Use in the main session when a sub-session has finished its task (or the user says "take / collect PREFIX-N"). Inspects the sub-session's report and branch, brings it into main with the user's approval, runs the checks, closes the task with /task-close, opens the bugs in the report as tasks with /task-open, and cleans up the worktree.
 argument-hint: "PREFIX-N"
 ---
 
@@ -14,7 +14,7 @@ This skill runs in the **main checkout**.
 
 ```bash
 git worktree list --porcelain | awk '/^worktree /{w=$2} /^branch /{print w, $2}'
-grep -l "^# PREFIX-N report" <each worktree>/.worktree/rapor.md
+grep -l "^# PREFIX-N report" <each worktree>/.worktree/report.md
 ```
 
 If there is no report, the sub-session has not finished or has not written it: look at the session's state with `mcp__ccd_session_mgmt__list_sessions` (`linked: true`); if it is running, wait; if it has finished, ask it for the report with `SendMessage`.
@@ -56,22 +56,22 @@ The `.worktree/` in the worktree is not affected during the rebase (it is outsid
 
 ## Step 4: Checks
 
-In the main checkout, the project's check command (root `CLAUDE.md`; `/is-kapat` Step 1).
+In the main checkout, the project's check command (root `CLAUDE.md`; `/task-close` Step 1).
 
 If it is red, do not close: say what broke; if the fix is small do it here, otherwise send it back to the sub-session (`SendMessage`).
 
 ## Step 5: Close the task
 
-Apply the steps of `/is-kapat PREFIX-N`; use the items in the report as evidence for `## Kabul` (acceptance criteria), but re-verify the ✓ items where needed (does the test name exist, does the command really pass). The ⏳ items in the report:
+Apply the steps of `/task-close PREFIX-N`; use the items in the report as evidence for `## Kabul` (acceptance criteria), but re-verify the ✓ items where needed (does the test name exist, does the command really pass). The ⏳ items in the report:
 
 - Those that can only be tried in the main session (device, simulator, single-copy resource) can be tried now (ask the user), or the task is moved to `review`.
 - "Questions asked" goes into the closing comment.
 
 ## Step 6: Findings and doc suggestions
 
-- For each finding in the report apply `/is-ac`: search first (if there is a match, write to that task), then show the user the title, tags and Kabul and open it with approval. The findings can be listed in one message and opened with a single approval.
-- Doc suggestions: as in `/is-kapat` Step 5; suggest, get approval, write.
-- If "Impact on other areas" is filled in, `/is-kapat` Step 3.
+- For each finding in the report apply `/task-open`: search first (if there is a match, write to that task), then show the user the title, tags and Kabul and open it with approval. The findings can be listed in one message and opened with a single approval.
+- Doc suggestions: as in `/task-close` Step 5; suggest, get approval, write.
+- If "Impact on other areas" is filled in, `/task-close` Step 3.
 
 All of these can go into a single `docs:` commit together with the task file; show the message, get approval.
 

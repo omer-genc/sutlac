@@ -9,5 +9,5 @@ dist/
 .claude/worktrees/
 .worktrees/
 
-# Worktree durumu (rapor): alt oturum yazar, ana oturum /is-topla ile okur
+# Worktree state (report): written by the sub-session, read by the main session with /task-collect
 .worktree/

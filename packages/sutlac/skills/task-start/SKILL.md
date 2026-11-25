@@ -1,5 +1,5 @@
 ---
-name: is-baslat
+name: task-start
 description: Use at the start of a session or when asked "where were we / what's next" - summarizes the open tasks in docs/tasks/ as active sprint and backlog, shows which ones have comments, and moves the chosen task to in-progress. A tag or a task number can be given as the argument.
 argument-hint: "[tag | PREFIX-N]"
 ---
@@ -64,7 +64,7 @@ Then ask a single question: which one do we start with?
 
 ## Step 4: Claim the chosen task
 
-When the user picks a task (or says "let's start PREFIX-N" directly, without `/is-baslat`), read the file **from top to bottom**: `## Bağlam` (context), `## Kabul` (acceptance criteria), `## Yapılacaklar` (to-dos), `## Notlar` (notes) and `## Yorumlar` (comments). The comments matter as much as the body; a later comment that contradicts the body replaces the body. Also open the `PREFIX-N`s mentioned in Bağlam.
+When the user picks a task (or says "let's start PREFIX-N" directly, without `/task-start`), read the file **from top to bottom**: `## Bağlam` (context), `## Kabul` (acceptance criteria), `## Yapılacaklar` (to-dos), `## Notlar` (notes) and `## Yorumlar` (comments). The comments matter as much as the body; a later comment that contradicts the body replaces the body. Also open the `PREFIX-N`s mentioned in Bağlam.
 
 **Gates**, before writing:
 
@@ -79,19 +79,19 @@ grep '^status:' docs/tasks/PREFIX-N.md
 ```
 
 - Don't touch the body, the `sprint` field or any other field.
-- If this transition isn't made, `/is-kapat` can't find which task is open.
+- If this transition isn't made, `/task-close` can't find which task is open.
 
 ## Step 5: Dig and explain
 
 **The task is a proposal, not a decision.** The solution direction written in the body can change, be rejected or be implemented as is, together with the user in this session.
 
-Read the code and the `git log` of the relevant area, and look at the root `CLAUDE.md` (and the subfolder's own `CLAUDE.md`, if there is one) and the relevant page in `docs/knowledge/`. Then, **before asking anything**, give a short summary (`/is-ac` > Asking questions): the situation, what you found, what you plan to do, the open questions. If there is no open question, say so and don't ask.
+Read the code and the `git log` of the relevant area, and look at the root `CLAUDE.md` (and the subfolder's own `CLAUDE.md`, if there is one) and the relevant page in `docs/knowledge/`. Then, **before asking anything**, give a short summary (`/task-open` > Asking questions): the situation, what you found, what you plan to do, the open questions. If there is no open question, say so and don't ask.
 
-- **If there is a design comment** (`**Design — <date>**`, `/is-ac` > Step 5), it is the design agreed on, together with the user's answers; don't ask the same questions again. But it was written against that day's code: if the code still matches, it holds; name the point that doesn't match and reopen only that. Don't throw away the whole design over one stale paragraph, and don't follow it silently either.
-- **If there is no Kabul or it isn't observable**, write it with the user before starting; `/is-kapat` asks for evidence against it.
+- **If there is a design comment** (`**Design — <date>**`, `/task-open` > Step 5), it is the design agreed on, together with the user's answers; don't ask the same questions again. But it was written against that day's code: if the code still matches, it holds; name the point that doesn't match and reopen only that. Don't throw away the whole design over one stale paragraph, and don't follow it silently either.
+- **If there is no Kabul or it isn't observable**, write it with the user before starting; `/task-close` asks for evidence against it.
 
 If the work can't proceed because of tooling (broken build, no access to the DB), try once; if it still fails, put the task you claimed back as you found it (`status: todo`), say why and stop. An `in-progress` left behind a dead session is invisible to both sides.
 
 ## Rules
 
-- Opening and closing tasks is not this skill's job: opening is `/is-ac`, closing is `/is-kapat`.
+- Opening and closing tasks is not this skill's job: opening is `/task-open`, closing is `/task-close`.

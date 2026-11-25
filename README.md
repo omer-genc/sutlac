@@ -42,14 +42,14 @@ The package has no runtime dependencies; it only needs [Bun](https://bun.sh). To
 
 Two ways to install them; don't use both (the skills would show up twice):
 
-1. **Plugin** (recommended: one place to update, hooks come along). Skills are named `/sutlac:is-ac` and so on:
+1. **Plugin** (recommended: one place to update, hooks come along). Skills are named `/sutlac:task-open` and so on:
 
    ```
    /plugin marketplace add omer-genc/sutlac
    /plugin install sutlac@sutlac
    ```
 
-2. **Copy** (checked into your repo, editable per project; `/is-ac`):
+2. **Copy** (checked into your repo, editable per project; `/task-open`):
 
    ```bash
    bunx sutlac skills    # .claude/skills/, .claude/hooks/sutlac/, .claude/settings.json
@@ -57,16 +57,18 @@ Two ways to install them; don't use both (the skills would show up twice):
 
 | Skill | When |
 | --- | --- |
-| `is-ac` | Open a task: searches existing tasks first and writes observable acceptance criteria |
-| `is-baslat` | Start of a session: summarises open tasks and moves the chosen one to `in-progress` |
-| `is-dagit` | Hand out tasks that don't overlap to separate worktree sessions |
-| `is-yap` | In a sub-session: do one task and write `.worktree/rapor.md` |
-| `is-topla` | Review the sub-session's branch, merge it with approval, file its findings as tasks |
-| `is-kapat` | Close with evidence (`done` or `review`) and update decision and knowledge docs |
+| `task-open` | Open a task: searches existing tasks first and writes observable acceptance criteria |
+| `task-start` | Start of a session: summarises open tasks and moves the chosen one to `in-progress` |
+| `task-dispatch` | Hand out tasks that don't overlap to separate worktree sessions |
+| `task-work` | In a sub-session: do one task and write `.worktree/report.md` |
+| `task-collect` | Review the sub-session's branch, merge it with approval, file its findings as tasks |
+| `task-close` | Close with evidence (`done` or `review`) and update decision and knowledge docs |
+
+Upgrading from 0.1.x: the skills were renamed (`is-ac` → `task-open`, `is-baslat` → `task-start`, `is-dagit` → `task-dispatch`, `is-yap` → `task-work`, `is-topla` → `task-collect`, `is-kapat` → `task-close`) and the sub-session report moved to `.worktree/report.md`. If you copied the skills with `sutlac skills`, delete the old `.claude/skills/is-*` folders after copying again.
 
 The skills assume nothing project-specific; they read the check command, commit style and parallel-work rules from the target repo's root `CLAUDE.md`. If the target repo has a `scripts/worktree-setup.sh`, it runs at the start of every worktree session (copying env files, picking ports and similar setup belongs there). The target repo's `.gitignore` should contain `.worktree/`.
 
-> **Language.** Everything is in English except the skill command names (`/is-ac` …) and the section headings inside task files: `## Bağlam` (context), `## Kabul` (acceptance criteria), `## Yapılacaklar` (to-dos), `## Notlar` (notes), `## Yorumlar` (comments). The UI parses those headings, so they are part of the file format.
+> **Language.** Everything is in English except the section headings inside task files: `## Bağlam` (context), `## Kabul` (acceptance criteria), `## Yapılacaklar` (to-dos), `## Notlar` (notes), `## Yorumlar` (comments). The UI parses those headings, so they are part of the file format.
 
 ## Releasing
 

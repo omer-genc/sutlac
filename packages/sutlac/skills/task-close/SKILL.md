@@ -1,5 +1,5 @@
 ---
-name: is-kapat
+name: task-close
 description: Use when a task is finished - runs the checks, audits the effect on other areas, moves the task file to done (or to review if acceptance still has to be tried in the real environment), writes the closing note as a comment, and updates the decision and knowledge docs. A task number can be given as the argument.
 argument-hint: "[PREFIX-N]"
 ---
@@ -59,7 +59,7 @@ This change affects mobile: src/hooks/use-order.ts:42 calls this endpoint.
 Shall we do the adaptation now, or should I open a separate task?
 ```
 
-If a separate task is wanted, open it by the rules of `/is-ac` (search first; if there is a match, not a new task but a dated line in that task's `## Notlar`). What is specific to a notice task:
+If a separate task is wanted, open it by the rules of `/task-open` (search first; if there is a match, not a new task but a dated line in that task's `## Notlar`). What is specific to a notice task:
 
 - `tags` is the target area; the source task goes in the first line: `Source: PREFIX-N`.
 - `## Bağlam` answers three questions: **what changed** (what was there before, what is there now; with the real endpoint and field names), **why it matters**, **what should be done**. The `file:line` grep found goes into `## Notlar` as a dated line, not into Bağlam; it can go stale.
@@ -95,7 +95,7 @@ Commit: `abc1234` feat(...): ...
 
 If the direction diverged from the body (the task was solved another way, or the scope narrowed), say that in the note too; the body is not changed.
 
-For a task moved to `review` the note has the same format; an item waiting to be tried is marked with `⏳` and how to try it is written: `3. ⏳ Order card: with the demo account, the shipping row shows in the order detail (not tried on a device)`. If the user tries it and drags it to `done` on the board, that is the approval; the UI writes `closed` itself. If the trial turns up a problem, the task goes back to `in-progress` and the finding is added as a comment. If the user asks, `/is-kapat PREFIX-N` is run again: the `⏳` items are proven, the task becomes `done` and the evidence is added in a second comment.
+For a task moved to `review` the note has the same format; an item waiting to be tried is marked with `⏳` and how to try it is written: `3. ⏳ Order card: with the demo account, the shipping row shows in the order detail (not tried on a device)`. If the user tries it and drags it to `done` on the board, that is the approval; the UI writes `closed` itself. If the trial turns up a problem, the task goes back to `in-progress` and the finding is added as a comment. If the user asks, `/task-close PREFIX-N` is run again: the `⏳` items are proven, the task becomes `done` and the evidence is added in a second comment.
 
 - The comment heading is only the time: `date '+%F %H:%M'`. No author is kept.
 - The comment text uses no `## ` heading and no line of the form `### <date time>`; the UI splits comments on these headings.
@@ -116,12 +116,12 @@ Go through them in order; if you know the answer, propose it and get it approved
 
 The task file (and any opened task, decision or knowledge changes) goes into the same commit if the work hasn't been committed yet; if it has, it becomes a separate `docs:` commit. Show the message and get approval before committing.
 
-The summary is three lines: whether the task closed (or what is waiting to be tried in `review`), which checks ran, which doc was opened or updated. Don't ask what's next; `/is-baslat` is there for that.
+The summary is three lines: whether the task closed (or what is waiting to be tried in `review`), which checks ran, which doc was opened or updated. Don't ask what's next; `/task-start` is there for that.
 
 ## Rules
 
 - No close if the checks aren't green (except a notice task that doesn't concern the area).
 - No close if there is an unmet criterion, a Kabul item without evidence or an unanswered question. If the only thing left is an item waiting to be tried in the real environment, the task becomes `review`, not `done`.
-- Don't open a task without approval and without a search (`/is-ac`).
+- Don't open a task without approval and without a search (`/task-open`).
 - The closing note is a comment; it is not written in the body.
 - If decisions and knowledge aren't updated here, they are never updated; don't skip Step 5.
