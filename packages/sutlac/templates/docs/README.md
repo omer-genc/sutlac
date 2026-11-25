@@ -1,42 +1,42 @@
 # Docs
 
-Bu klasör dosya tabanlı bir iş takibidir ([sutlac](https://www.npmjs.com/package/sutlac)): **işler** (yapılacaklar) ve **dokümanlar** (bilgi, karar) ayrıdır, sprintler de birer dosyadır. Dış bir araç yoktur; her şey repodaki md dosyalarıdır.
+This folder is a file-based issue tracker ([sutlac](https://www.npmjs.com/package/sutlac)): **tasks** (work to do) and **docs** (knowledge, decisions) are separate, and sprints are files too. There is no external tool; everything is md files in the repo.
 
-| Yer | Ne |
+| Where | What |
 | --- | --- |
-| `tasks/` | **İşler**: `{{PREFIX}}-1.md`, `{{PREFIX}}-2.md`... Dosyanın yeri hiç değişmez (bkz. `tasks/README.md`) |
-| `sprints/` | **Sprintler**: `sprint-1.md`... Tarihler, hedef, kapanışta devredilenler (bkz. `sprints/README.md`) |
-| `knowledge/` | Doküman: kalıcı ortak bilgi (akışlar, ortamlar, tuzaklar) |
-| `decisions/` | Doküman: alınan kararlar, `0001-kisa-baslik.md` biçiminde: bağlam, karar, sonuçlar |
-| `images/` | Belgelerdeki resimler, `<id>.<uzantı>` adıyla tek klasörde (bkz. aşağıda "Resimler") |
-| `config.json` | Arayüz adı (`title`), iş öneki (`prefix`: `{{PREFIX}}` → `{{PREFIX}}-12`), etiketler, durumlar, öncelikler ve işlere eklenebilen özel alanlar |
+| `tasks/` | **Tasks**: `{{PREFIX}}-1.md`, `{{PREFIX}}-2.md`... A file's location never changes (see `tasks/README.md`) |
+| `sprints/` | **Sprints**: `sprint-1.md`... Dates, goal, what was carried over at close (see `sprints/README.md`) |
+| `knowledge/` | Doc: lasting shared knowledge (flows, environments, pitfalls) |
+| `decisions/` | Doc: decisions made, in the form `0001-short-title.md`: context, decision, consequences |
+| `images/` | Images used in the docs, in a single folder, named `<id>.<ext>` (see "Images" below) |
+| `config.json` | UI name (`title`), task prefix (`prefix`: `{{PREFIX}}` → `{{PREFIX}}-12`), tags, statuses, priorities and the custom fields that can be added to tasks |
 
-`tasks/` ve `sprints/` dışındaki her `.md` bir dokümandır; yeni bir klasör açmak doküman ağacına yeni bir bölüm ekler.
+Every `.md` outside `tasks/` and `sprints/` is a doc; creating a new folder adds a new section to the doc tree.
 
-## Arayüz
+## UI
 
-`bunx sutlac` (varsayılan port 4400; `--port`, `--no-open`, `--dir <klasör>`). Klasör verilmezse çalışılan klasörden yukarı doğru ilk `docs/config.json` açılır. `prefix` ve `title` Ayarlar'da görünmez, `config.json`'dan değişir; önek değişirse var olan iş dosyaları elle yeniden adlandırılmalıdır. Her değişiklik doğrudan md dosyasına yazılır; dosya başka yerde değişince sayfa kendini yeniler.
+`bunx sutlac` (default port 4400; `--port`, `--no-open`, `--dir <folder>`). If no folder is given, the first `docs/config.json` found going upward from the working folder is opened. `prefix` and `title` don't appear in Settings; they are changed in `config.json`. If the prefix changes, existing task files must be renamed by hand. Every change is written straight to the md file; when a file changes elsewhere, the page refreshes itself.
 
-| Sayfa | Ne |
+| Page | What |
 | --- | --- |
-| Board | Aktif sprintin işleri, durum kolonlarında; kart sürüklemek `status`u yazar |
-| Backlog | Aktif sprintte olmayan açık işler; "Sprinte al" `sprint: N` yazar |
-| Tüm işler | Her iş, durum/etiket/öncelik süzgeçleriyle |
-| Sprintler | Sprint listesi ve sprint sayfası (hedef, işler, devredilenler) |
-| Arşiv | Kapanmış ve sprinti olmayan ya da sprinti kapanmış işler (dosya taşınmaz, hesaplanır) |
-| Dokümanlar | Solda klasör ağacı, sağda sayfa |
-| Ayarlar | `config.json` düzenleyicisi |
+| Board | The active sprint's tasks, in status columns; dragging a card writes `status` |
+| Backlog | Open tasks not in the active sprint; "Add to sprint" writes `sprint: N` |
+| All tasks | Every task, with status/tag/priority filters |
+| Sprints | The sprint list and the sprint page (goal, tasks, carried over) |
+| Archive | Closed tasks that have no sprint or whose sprint is closed (the file isn't moved, it is computed) |
+| Docs | Folder tree on the left, page on the right |
+| Settings | `config.json` editor |
 
-İş ve doküman metni editörde düzenlenir; kayıtta değişmeyen paragraf, liste ve tablolar dosyadaki halleriyle kalır, yalnız düzenlenen blok yeniden yazılır. "Kaynak" düğmesi dosyanın tamamını düz metin açar. Yorumlar dosyanın sonundaki `## Yorumlar` bölümüne yazılır (biçim: `tasks/README.md`).
+Task and doc text is edited in the editor; on save, unchanged paragraphs, lists and tables stay as they are in the file, and only the edited block is rewritten. The "Source" button opens the whole file as plain text. Comments are written to the `## Yorumlar` (comments) section at the end of the file (format: `tasks/README.md`).
 
-## Komut satırı
+## Command line
 
 ```bash
-bunx sutlac list          # açık işler, satır başına bir iş (--all, --tag <etiket>, --json)
-bunx sutlac next          # sıradaki iş numarası
-bunx sutlac check         # belgelerdeki yollar ve resim bağlantıları repoda mı
+bunx sutlac list          # open tasks, one task per line (--all, --tag <tag>, --json)
+bunx sutlac next          # the next task number
+bunx sutlac check         # whether paths and image links in the docs exist in the repo
 ```
 
-## Resimler
+## Images
 
-Bütün resimler tek klasörde, `images/` altında durur; belge başına klasör yoktur ve dosya orijinal adıyla değil id'siyle adlanır: id içeriğin SHA-256 özetinin ilk 16 hex hanesidir (`images/3f9a0c1d2e4b5a67.png`), aynı resim iki kez eklenirse tek dosya olur. Kabul edilen türler PNG, JPEG, WebP ve GIF'tir (SVG içinde betik taşıyabildiği için yok), sınır 5 MB'tır. Belge resme standart markdown ve göreli yolla bağlanır: `tasks/{{PREFIX}}-12.md` içinde `![](../images/<id>.png)`; böylece dosya GitHub'da ve düz metinde de görünür. Arayüzde editöre ya da yoruma resim yapıştırmak veya sürükleyip bırakmak dosyayı `images/`'e yazar ve bağlantıyı ekler; elle eklerken de aynı ad ve yol kuralı geçerlidir. Bağlantısı kalmayan resim kendiliğinden silinmez. `bunx sutlac check` kırık resim bağlantısını yakalar.
+All images sit in a single folder, under `images/`; there is no folder per doc, and a file is named by its id, not its original name: the id is the first 16 hex digits of the content's SHA-256 digest (`images/3f9a0c1d2e4b5a67.png`), and the same image added twice becomes a single file. The accepted types are PNG, JPEG, WebP and GIF (no SVG, because it can carry script), and the limit is 5 MB. A doc links to an image with standard markdown and a relative path: `![](../images/<id>.png)` inside `tasks/{{PREFIX}}-12.md`; this way the file also shows on GitHub and in plain text. In the UI, pasting or dragging and dropping an image into the editor or a comment writes the file to `images/` and inserts the link; the same name and path rule applies when adding by hand. An image that no longer has a link is not deleted automatically. `bunx sutlac check` catches broken image links.

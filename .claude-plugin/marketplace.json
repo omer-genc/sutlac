@@ -1,11 +1,13 @@
 {
   "name": "sutlac",
-  "owner": { "name": "omer-genc" },
+  "owner": {
+    "name": "omer-genc"
+  },
   "plugins": [
     {
       "name": "sutlac",
       "source": "./packages/sutlac",
-      "description": "Repodaki docs/ klasöründe iş takibi: iş açma, başlatma, paralel oturumlara dağıtma, toplama ve kapatma skill'leri."
+      "description": "Issue tracking in your repo's docs/ folder: local UI, CLI and Claude Code skills to open, start, hand out, collect and close tasks."
     }
   ]
 }

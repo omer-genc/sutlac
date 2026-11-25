@@ -1,27 +1,29 @@
 # sütlaç
 
-Repodaki `docs/` klasörünü iş takibine çevirir: her iş, sprint ve karar bir markdown dosyasıdır. Yerel arayüz (board, backlog, sprintler, doküman ağacı), komut satırı ve Claude Code skill'leri. Çalışma anında bağımlılık yok; yalnız [Bun](https://bun.sh) gerekir.
+Turns the `docs/` folder in your repo into an issue tracker: every task, sprint and decision is a markdown file. A local UI (board, backlog, sprints, docs tree), a CLI and Claude Code skills. No runtime dependencies; it only needs [Bun](https://bun.sh).
 
 ```bash
 bun add -d sutlac
-bunx sutlac init --prefix KES --title "Proje Docs"   # docs/ iskeleti
-bunx sutlac                                          # arayüz, :4400
+bunx sutlac init --prefix KES --title "Project Docs"   # docs/ skeleton
+bunx sutlac                                            # UI on :4400
 ```
 
-| Komut | Ne yapar |
+| Command | What it does |
 | --- | --- |
-| `sutlac` | Arayüzü açar (`--port`, `--no-open`, `--dir <docs>`) |
-| `sutlac init` | `docs/` iskeletini kurar (`--prefix`, `--title`, `--dir`) |
-| `sutlac list` | Açık işler, satır başına bir iş (`--all`, `--tag`, `--json`) |
-| `sutlac next` | Sıradaki iş numarası |
-| `sutlac check` | Belgelerdeki yollar ve resim bağlantıları repoda mı |
-| `sutlac skills` | Skill ve hook'ları `.claude/` altına kopyalar (`--no-hooks`, `--to`) |
+| `sutlac` | Opens the UI (`--port`, `--no-open`, `--dir <docs>`) |
+| `sutlac init` | Creates the `docs/` skeleton (`--prefix`, `--title`, `--dir`) |
+| `sutlac list` | Open tasks, one per line (`--all`, `--tag`, `--json`) |
+| `sutlac next` | Next task number |
+| `sutlac check` | Verifies that paths and image links mentioned in your docs exist in the repo |
+| `sutlac skills` | Copies the skills and hooks into `.claude/` (`--no-hooks`, `--to`) |
 
-Skill'ler (`is-ac`, `is-baslat`, `is-dagit`, `is-yap`, `is-topla`, `is-kapat`) Claude Code eklentisi olarak da kurulur:
+The skills (`is-ac`, `is-baslat`, `is-dagit`, `is-yap`, `is-topla`, `is-kapat`) cover a task's whole life: open, start, hand out to parallel worktree sessions, do, collect, close with evidence. They also install as a Claude Code plugin:
 
 ```
 /plugin marketplace add omer-genc/sutlac
 /plugin install sutlac@sutlac
 ```
 
-Ayrıntı: https://github.com/omer-genc/sutlac
+Section headings inside task files (`## Bağlam` context, `## Kabul` acceptance criteria, `## Yorumlar` comments) are part of the file format and are Turkish.
+
+More: https://github.com/omer-genc/sutlac

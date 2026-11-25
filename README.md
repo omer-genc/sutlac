@@ -1,66 +1,77 @@
 # sütlaç
 
-Repodaki `docs/` klasörünü iş takibine çevirir: her iş, sprint ve karar bir markdown dosyasıdır. Sütlaç bu klasöre yerel bir arayüz (board, backlog, sprintler, doküman ağacı), bir komut satırı ve Claude Code skill'leri ekler. Dış araç ya da MCP yoktur.
+Turns the `docs/` folder in your repo into an issue tracker: every task, sprint and decision is a markdown file. Sütlaç adds a local UI (board, backlog, sprints, docs tree), a CLI and Claude Code skills on top of that folder. No external service, no MCP.
 
-## Bu repo
+## This repo
 
-| Yer | Ne |
+| Path | What |
 | --- | --- |
-| `packages/sutlac` | Paketin kendisi: komut satırı ve sunucu (`src/`), arayüz (React, `bun run build` ile `dist/`e paketlenir), skill'ler (`skills/`), hook'lar (`hooks/`), `sutlac init` şablonları (`templates/`). Aynı klasör Claude Code eklentisinin de köküdür (`.claude-plugin/plugin.json`) |
-| `apps/site` | Tanıtım sitesi: düz HTML + CSS, `bun build` ile statik çıktı |
-| `.claude-plugin/marketplace.json` | Bu repoyu eklenti pazarı yapar; eklenti `packages/sutlac`'ı gösterir |
-| `docs/` | Bu reponun kendi işleri (önek `SUT`); paket kendi üstünde kullanılır |
+| `packages/sutlac` | The package: CLI and server (`src/`), UI (React, bundled into `dist/` by `bun run build`), skills (`skills/`), hooks (`hooks/`), `sutlac init` templates (`templates/`). The same folder is the root of the Claude Code plugin (`.claude-plugin/plugin.json`) |
+| `apps/site` | Landing site: plain HTML + CSS, static output via `bun build` |
+| `.claude-plugin/marketplace.json` | Makes this repo a plugin marketplace; the plugin points at `packages/sutlac` |
+| `docs/` | This repo's own tasks (prefix `SUT`); the package is used on itself |
 
 ```bash
 bun install
-bun run docs          # arayüz, bu reponun docs/ klasörüyle (geliştirme kipi, HMR)
-bun run dev:site      # site, :4500
-bun run check         # belge yolları + typecheck + test
-bun run build         # paketin arayüzü ve site
+bun run docs          # UI against this repo's docs/ folder (dev mode, HMR)
+bun run dev:site      # site on :4500
+bun run check         # doc paths + typecheck + tests
+bun run build         # package UI and site
 ```
 
-## Başka bir repoda kullanmak
+## Using it in another repo
 
 ```bash
 bun add -d sutlac
-bunx sutlac init --prefix KES --title "Keskin Docs"   # docs/ iskeleti
-bunx sutlac                                           # arayüz, :4400
+bunx sutlac init --prefix KES --title "Project Docs"   # docs/ skeleton
+bunx sutlac                                            # UI on :4400
 ```
 
-Paket çalışma anında bağımlılık istemez; yalnız [Bun](https://bun.sh) gerekir. Yayınlanmadan önce yerelde denemek için: `bun add -d /mutlak/yol/sutlac/packages/sutlac` (önce orada `bun run build`).
+The package has no runtime dependencies; it only needs [Bun](https://bun.sh). To try an unpublished build locally: `bun add -d /absolute/path/to/sutlac/packages/sutlac` (run `bun run build` there first).
 
-### Skill'ler
+| Command | What it does |
+| --- | --- |
+| `sutlac` | Opens the UI (`--port`, `--no-open`, `--dir <docs>`) |
+| `sutlac init` | Creates the `docs/` skeleton (`--prefix`, `--title`, `--dir`) |
+| `sutlac list` | Open tasks, one per line (`--all`, `--tag`, `--json`) |
+| `sutlac next` | Next task number |
+| `sutlac check` | Verifies that paths and image links mentioned in your docs exist in the repo |
+| `sutlac skills` | Copies the skills and hooks into `.claude/` (`--no-hooks`, `--to`) |
 
-İki yol; ikisi birlikte kullanılmaz (skill'ler iki kez görünür):
+### Skills
 
-1. **Eklenti** (önerilen; güncelleme tek yerden, hook'lar kendiliğinden gelir). Skill'ler `/sutlac:is-ac` biçiminde adlanır:
+Two ways to install them; don't use both (the skills would show up twice):
+
+1. **Plugin** (recommended: one place to update, hooks come along). Skills are named `/sutlac:is-ac` and so on:
 
    ```
    /plugin marketplace add omer-genc/sutlac
    /plugin install sutlac@sutlac
    ```
 
-2. **Kopya** (repoya girer, projeye göre düzenlenebilir; `/is-ac`):
+2. **Copy** (checked into your repo, editable per project; `/is-ac`):
 
    ```bash
    bunx sutlac skills    # .claude/skills/, .claude/hooks/sutlac/, .claude/settings.json
    ```
 
-| Skill | Ne zaman |
+| Skill | When |
 | --- | --- |
-| `is-ac` | Yeni iş: önce arar, eşleşme varsa açmaz; gözlenebilir Kabul maddeleriyle yazar |
-| `is-baslat` | Oturum başı: açık işleri özetler, seçileni `in-progress`'e alır |
-| `is-dagit` | Birbirine dokunmayan işleri ayrı worktree oturumlarına dağıtır |
-| `is-yap` | Alt oturumda tek işi yapar, `.worktree/rapor.md` yazar |
-| `is-topla` | Alt oturumun dalını denetler, onayla ana dala alır, bulguları iş olarak açar |
-| `is-kapat` | Kanıtla kapatır (`done` ya da `review`), karar ve bilgi dokümanlarını günceller |
+| `is-ac` | Open a task: searches existing tasks first and writes observable acceptance criteria |
+| `is-baslat` | Start of a session: summarises open tasks and moves the chosen one to `in-progress` |
+| `is-dagit` | Hand out tasks that don't overlap to separate worktree sessions |
+| `is-yap` | In a sub-session: do one task and write `.worktree/rapor.md` |
+| `is-topla` | Review the sub-session's branch, merge it with approval, file its findings as tasks |
+| `is-kapat` | Close with evidence (`done` or `review`) and update decision and knowledge docs |
 
-Skill'ler projeye özgü hiçbir şeyi varsaymaz; kontrol komutunu, commit biçimini ve paralel çalışma kurallarını hedef reponun kök `CLAUDE.md`'sinden okur. Worktree'de açılan oturum için hedef repoda `scripts/worktree-setup.sh` varsa oturum başında çalıştırılır (env kopyalama, port seçimi gibi projeye özgü kurulum oraya yazılır). Hedef reponun `.gitignore`'unda `.worktree/` olmalı.
+The skills assume nothing project-specific; they read the check command, commit style and parallel-work rules from the target repo's root `CLAUDE.md`. If the target repo has a `scripts/worktree-setup.sh`, it runs at the start of every worktree session (copying env files, picking ports and similar setup belongs there). The target repo's `.gitignore` should contain `.worktree/`.
 
-## Yayın
+> **Language.** Everything is in English except the skill command names (`/is-ac` …) and the section headings inside task files: `## Bağlam` (context), `## Kabul` (acceptance criteria), `## Yapılacaklar` (to-dos), `## Notlar` (notes), `## Yorumlar` (comments). The UI parses those headings, so they are part of the file format.
+
+## Releasing
 
 ```bash
-cd packages/sutlac && bun publish     # prepublishOnly: typecheck + test + build
+cd packages/sutlac && npm publish --access public     # prepublishOnly: typecheck + test + build
 ```
 
-Eklenti git reposundan kurulur, npm'den değil; sürüm `packages/sutlac/package.json` ve `packages/sutlac/.claude-plugin/plugin.json`'da birlikte artar.
+The plugin installs from the git repo, not from npm; bump the version in `packages/sutlac/package.json` and `packages/sutlac/.claude-plugin/plugin.json` together.

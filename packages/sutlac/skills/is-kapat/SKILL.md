@@ -1,127 +1,127 @@
 ---
 name: is-kapat
-description: Bir iş bittiğinde kullan - kontrolleri çalıştırır, diğer alanlara etkisini denetler, iş dosyasını done'a (kabulün gerçek ortamda denenmesi kaldıysa review'a) alıp kapanış notunu yorum olarak yazar, karar ve bilgi dokümanlarını günceller. Argüman olarak iş numarası verilebilir.
-argument-hint: "[ÖNEK-N]"
+description: Use when a task is finished - runs the checks, audits the effect on other areas, moves the task file to done (or to review if acceptance still has to be tried in the real environment), writes the closing note as a comment, and updates the decision and knowledge docs. A task number can be given as the argument.
+argument-hint: "[PREFIX-N]"
 ---
 
-# İşi kapat
+# Close the task
 
-> **Önek ve proje bilgisi.** Aşağıda `ÖNEK-N` bir iş numarasıdır; önek `docs/config.json` > `prefix` alanındadır (ör. `KES` → `KES-12`, dosyası `docs/tasks/KES-12.md`). Komutlarda `ÖNEK` yerine gerçek öneki yaz. Projeye özgü her şey (kontrol komutu, alanlar/uygulamalar, deneme hesapları, paralel çalışmanın tuzakları) kök `CLAUDE.md`'de ve `docs/knowledge/`'tadır; bu skill onları oradan okur, ezbere varsaymaz.
+> **Prefix and project info.** Below, `PREFIX-N` is a task number; the prefix is in `docs/config.json` > `prefix` (e.g. `KES` → `KES-12`, file `docs/tasks/KES-12.md`). In commands, write the real prefix in place of `PREFIX`. Everything project-specific (the check command, areas/apps, test accounts, the pitfalls of parallel work) is in the root `CLAUDE.md` and in `docs/knowledge/`; this skill reads it from there and does not assume it from memory.
 
-Bir işi kapatır ve öğrenileni kalıcı hale getirir. Biçim ve kurallar: `docs/tasks/README.md`.
+Closes a task and makes what was learned permanent. Format and rules: `docs/tasks/README.md`.
 
-## Adım 0: İşi belirle
+## Step 0: Identify the task
 
-`$ARGUMENTS`'ta `ÖNEK-N` varsa onu kullan. Yoksa `grep -l '^status: \(in-progress\|review\)' docs/tasks/ÖNEK-*.md` ile devam edenleri ve review'dakileri bul: tam bir tane varsa onu varsay ve **söyleyerek** devam et, birden fazlaysa sor, hiç yoksa numara iste.
+If `$ARGUMENTS` contains a `PREFIX-N`, use it. Otherwise find the ones in progress and in review with `grep -l '^status: \(in-progress\|review\)' docs/tasks/PREFIX-*.md`: if there is exactly one, assume it and continue **while saying so**; if there is more than one, ask; if there is none, ask for a number.
 
-Dosyayı baştan sona oku: Bağlam, Kabul, Yapılacaklar, Notlar ve varsa `## Yorumlar`. Gövdeyle çelişen sonraki bir yorum (kapsamı daraltan, kriteri değiştiren) gövdenin yerini alır.
+Read the file from top to bottom: `## Bağlam` (context), `## Kabul` (acceptance criteria), `## Yapılacaklar` (to-dos), `## Notlar` (notes) and, if present, `## Yorumlar` (comments). A later comment that contradicts the body (narrowing the scope, changing a criterion) replaces the body.
 
-## Adım 1: Yapılanı doğrula
+## Step 1: Verify what was done
 
-**Kanıt olmadan kapatma.**
+**Don't close without evidence.**
 
 ```bash
 git status --short
 git log --oneline -5
 ```
 
-Çalışma ağacı kirliyse sor: commit edilecek mi, yoksa iş gerçekten bitmedi mi?
+If the working tree is dirty, ask: will it be committed, or is the task really not finished?
 
-Projenin kontrol komutunu çalıştır ve **çıktıyı gör**. Komut kök `CLAUDE.md`'de yazar (tipik olarak typecheck + lint + test'i birlikte koşan tek komut, ör. `bun run check`); yazmıyorsa `package.json` betiklerinden bul ve kullanıcıya hangisini çalıştırdığını söyle. Üretilen dosyası olan projede (şema, tip, sözleşme) üretim komutunun çalıştırılmış olması da bu adımın parçasıdır.
+Run the project's check command and **look at the output**. The command is written in the root `CLAUDE.md` (typically a single command that runs typecheck + lint + test together, e.g. `bun run check`); if it isn't, find it in the `package.json` scripts and tell the user which one you ran. In a project with generated files (schema, types, contract), having run the generation command is also part of this step.
 
-Kontroller geçmiyorsa işi kapatma; durumu söyle ve dur.
+If the checks don't pass, don't close the task; state the situation and stop.
 
-## Adım 2: Kapanışı engelleyen bir şey var mı
+## Step 2: Is anything blocking the close
 
-- **Kabul:** Her madde için kanıt göster: onu doğrulayan test, komut çıktısı, istek/yanıt ya da tarayıcıda görülen. "Kod bunu yapıyor" kanıt değildir. Kanıtlanamayan madde ya kanıtlanır, ya kullanıcıyla birlikte değiştirilir, ya neden kanıtlanamadığı kapanış notuna yazılır (kullanıcı onayıyla) ya da iş `review`'a alınır (Adım 4). Kanıtsız işaretleme yok. Kanıtı olmayan, yerelde denenebilecek maddeleri şimdi dene (uygulamayı çalıştır, isteği at, ekrana bak; projede bunun için bir skill varsa onu kullan) ve gördüğünü kanıt olarak yaz.
-- **Kapsam:** İş birden fazla alanı değiştirdiyse ya da yeni bir ekran, tablo veya akış getirdiyse bir alt agent'a (projede eleştiri için bir agent varsa ona) iş dosyasını ve diff'i ver: Kabul gerçekten karşılandı mı, kimsenin kullanmayacağı parça kaldı mı? Hükmü kullanıcıya göster; "engel" bulgusu varsa kullanıcı karar vermeden kapatma. Kullanıcı bulguyu kabul edip kapatırsa bunu kapanış notuna yaz.
-- **Yapılacaklar:** İşaretlenmemiş kutucuk varsa ya karşıla ya da kullanıcıyla birlikte çıkar. Karşılanmamış maddeyle kapatma.
-- **Yorumlar:** `## Yorumlar`'da cevapsız kalmış bir soru varsa (soru sorulmuş, altında cevap yok) kapatma. Cevabı biliyorsan yorum olarak yaz; bilmiyorsan kullanıcıya sor. Kendi kafandan cevaplayıp geçme.
+- **Kabul:** Show evidence for each item: the test that verifies it, command output, request/response or what was seen in the browser. "The code does this" is not evidence. An item that can't be proven is either proven, or changed together with the user, or the reason it couldn't be proven is written in the closing note (with the user's approval), or the task is moved to `review` (Step 4). No ticking without evidence. Try the items that have no evidence and can be tried locally now (run the app, send the request, look at the screen; if the project has a skill for this, use it) and write what you saw as evidence.
+- **Scope:** If the task changed more than one area or brought a new screen, table or flow, give the task file and the diff to a sub-agent (to the project's critique agent, if it has one): was Kabul really met, is there a piece left that nobody will use? Show the verdict to the user; if there is a "blocker" finding, don't close before the user decides. If the user accepts the finding and closes anyway, write that in the closing note.
+- **Yapılacaklar:** If there is an unticked checkbox, either satisfy it or remove it together with the user. Don't close with an unmet item.
+- **Yorumlar:** If there is an unanswered question in `## Yorumlar` (a question was asked, no answer below it), don't close. If you know the answer, write it as a comment; if you don't, ask the user. Don't answer it out of your own head and move on.
 
-## Adım 3: Diğer alanlar
+## Step 3: Other areas
 
-Tek parçalı projede bu adım atlanır. Birden fazla uygulama ya da paket varsa: yapılan iş bir başkasının kullandığı bir şeyi değiştirdi mi (bir uç, bir yanıt alanı, dışa açılan bir fonksiyon, bir davranış)? Bu kontrol atlanırsa diğer taraf sessizce geride kalır.
+In a single-part project this step is skipped. If there is more than one app or package: did the work change something another one uses (an endpoint, a response field, an exported function, a behaviour)? If this check is skipped, the other side silently falls behind.
 
-Önce kanıt topla, tahmin etme:
+Gather evidence first, don't guess:
 
-- Tipler paylaşılıyorsa kökten typecheck kırılan yerleri gösterir (Adım 1'de zaten çalıştı). Tip değişmeyen davranış değişikliklerini typecheck görmez; çağrı yerlerini ara:
+- If types are shared, a typecheck from the root shows the places that break (it already ran in Step 1). Typecheck doesn't see behaviour changes where the type doesn't change; search for the call sites:
 
   ```bash
-  grep -rn "<ucun ya da fonksiyonun ayırt edici parçası>" <diğer alanların kaynak klasörleri>
+  grep -rn "<distinctive fragment of the endpoint or function>" <source folders of the other areas>
   ```
 
-  Çıktı boşsa o alan bunu kullanmıyor demektir. Adlarda tekil/çoğul ve sondaki eğik çizgi değişir; tam yolla değil ayırt edici parçayla ara.
+  If the output is empty, that area doesn't use it. Singular/plural and the trailing slash vary in names; search with the distinctive fragment, not the full path.
 
-Etkilenen alan varsa **varsayılan, uyarlamayı aynı işte yapmaktır.** Kullanıcıya bulguyu göster ve sor:
+If an area is affected, **the default is to do the adaptation in the same task.** Show the finding to the user and ask:
 
 ```
-Bu değişiklik mobili etkiliyor: src/hooks/use-order.ts:42 bu ucu çağırıyor.
-Uyarlamayı şimdi mi yapalım, yoksa ayrı iş mi açayım?
+This change affects mobile: src/hooks/use-order.ts:42 calls this endpoint.
+Shall we do the adaptation now, or should I open a separate task?
 ```
 
-Ayrı iş istenirse `/is-ac`'ın kurallarıyla aç (önce arama; eşleşme varsa yeni iş değil, o işin `## Notlar`'ına tarihli satır). Haber işine özgü olanlar:
+If a separate task is wanted, open it by the rules of `/is-ac` (search first; if there is a match, not a new task but a dated line in that task's `## Notlar`). What is specific to a notice task:
 
-- `tags` hedef alan; ilk satırda kaynak iş: `Kaynak: ÖNEK-N`.
-- `## Bağlam` üç soruyu cevaplar: **ne değişti** (önce ne vardı, şimdi ne var; gerçek uç ve alan adlarıyla), **neden ilgilendirir**, **ne yapılmalı**. Grep'in bulduğu `dosya:satır` Bağlam'a değil `## Notlar`'a tarihli satır olarak girer; eskiyebilir.
-- `## Kabul` hedef alanda gözlenecek davranıştır: "Sipariş detayı yeni `items[]` şekliyle kalemleri listeler".
+- `tags` is the target area; the source task goes in the first line: `Source: PREFIX-N`.
+- `## Bağlam` answers three questions: **what changed** (what was there before, what is there now; with the real endpoint and field names), **why it matters**, **what should be done**. The `file:line` grep found goes into `## Notlar` as a dated line, not into Bağlam; it can go stale.
+- `## Kabul` is the behaviour to be observed in the target area: "Order detail lists the line items with the new `items[]` shape".
 
-Değişiklik başka alanı ilgilendirmiyorsa bunu kapanış notunda tek cümleyle söyle.
+If the change doesn't concern another area, say so in one sentence in the closing note.
 
-## Adım 4: İşi kapat ya da review'a al
+## Step 4: Close the task or move it to review
 
-**`review` ne demek:** kod bitti ve commit'lendi, kontroller yeşil (Adım 1); eksik olan, Kabul'ün bir ya da birkaç maddesinin gerçek ortamda (uygulamada, canlı veride) denenmesi ya da kullanıcının onayı. Kontroller kırmızıysa, Yapılacaklar'da karşılanmamış kutucuk ya da cevapsız soru varsa iş `review`'a da alınmaz; `in-progress`'te kalır.
+**What `review` means:** the code is finished and committed, the checks are green (Step 1); what is missing is trying one or more Kabul items in the real environment (in the app, on live data) or the user's approval. If the checks are red, or there is an unmet checkbox in Yapılacaklar or an unanswered question, the task doesn't go to `review` either; it stays in `in-progress`.
 
-- Kabul'ün her maddesi kanıtlıysa (ya da kanıtlanamayışı kullanıcı onayıyla nota yazıldıysa): `done`.
-- Bir madde yalnız gerçek ortamda denenerek kanıtlanabiliyorsa ve henüz denenmediyse: `review`. Kullanıcıya hangi maddenin neden kaldığını söyle.
+- If every Kabul item has evidence (or its unprovability was written in the note with the user's approval): `done`.
+- If an item can only be proven by trying it in the real environment and it hasn't been tried yet: `review`. Tell the user which item is left and why.
 
-1. Yapılacaklar'daki tamamlanan kutucukları `- [x]` yap.
-2. Frontmatter: `done` için `status: done`, `closed: <date +%F>` (tarihi komutla al, uydurma); `review` için `status: review`, `closed` boş kalır.
-3. Kapanış notunu **yorum olarak** dosyanın en sonundaki `## Yorumlar` bölümüne ekle; bölüm yoksa aç. Gövde işin tanımıdır, yorum ne olduğunun kaydıdır.
+1. Make the completed checkboxes in Yapılacaklar `- [x]`.
+2. Frontmatter: for `done`, `status: done`, `closed: <date +%F>` (get the date from the command, don't make it up); for `review`, `status: review`, `closed` stays empty.
+3. Add the closing note **as a comment** to the `## Yorumlar` section at the very end of the file; if the section doesn't exist, create it. The body is the definition of the task, the comment is the record of what happened.
 
 ```md
 ## Yorumlar
 
 ### 2026-10-24 21:30
 
-**Yapılan:** iki-üç cümle; ne değişti, neden bu yol seçildi. Diğer alanlara etkisi: yok / ÖNEK-N açıldı / aynı işte uyarlandı.
+**What changed:** two or three sentences; what changed, why this route was chosen. Effect on other areas: none / PREFIX-N opened / adapted in the same task.
 
-**Kabul:**
-1. ✓ `order.service.test.ts` "şube kapsamı" testi
-2. ✓ `GET /api/v1/orders/123` → 403 (yerel, şube hesabı)
-3. ✗ Push bildirimi: canlı cihaz olmadan denenemedi; kullanıcı onayıyla kapatıldı.
+**Acceptance:**
+1. ✓ `order.service.test.ts` "branch scope" test
+2. ✓ `GET /api/v1/orders/123` → 403 (local, branch account)
+3. ✗ Push notification: couldn't be tried without a live device; closed with the user's approval.
 
 Commit: `abc1234` feat(...): ...
 ```
 
-Gövdeyle ayrılan yön varsa (iş başka bir yoldan çözüldüyse ya da kapsam daraldıysa) bunu da notta söyle; gövde değiştirilmez.
+If the direction diverged from the body (the task was solved another way, or the scope narrowed), say that in the note too; the body is not changed.
 
-`review`'a alınan işte not aynı biçimdedir; denenmeyi bekleyen madde `⏳` ile işaretlenir ve nasıl deneneceği yazılır: `3. ⏳ Sipariş kartı: demo hesapla sipariş detayında kargo satırı görünüyor (cihazda denenmedi)`. Kullanıcı deneyip board'da `done`'a sürüklerse bu onaydır; arayüz `closed`'u kendisi yazar. Denemede sorun çıkarsa iş `in-progress`'e döner ve bulgu yorum olarak eklenir. Kullanıcı istenirse `/is-kapat ÖNEK-N` yeniden çalıştırılır: `⏳` maddeler kanıtlanır, iş `done` olur ve kanıt ikinci bir yorumla eklenir.
+For a task moved to `review` the note has the same format; an item waiting to be tried is marked with `⏳` and how to try it is written: `3. ⏳ Order card: with the demo account, the shipping row shows in the order detail (not tried on a device)`. If the user tries it and drags it to `done` on the board, that is the approval; the UI writes `closed` itself. If the trial turns up a problem, the task goes back to `in-progress` and the finding is added as a comment. If the user asks, `/is-kapat PREFIX-N` is run again: the `⏳` items are proven, the task becomes `done` and the evidence is added in a second comment.
 
-- Yorum başlığı yalnız zamandır: `date '+%F %H:%M'`. Yazan tutulmaz.
-- Yorum metninde `## ` başlığı ve `### <tarih saat>` biçiminde satır kullanılmaz; arayüz yorumları bu başlıklardan ayırır.
-- `## Yorumlar` her zaman son bölümdür. `## Notlar`'a satır eklerken onun önüne ekle.
+- The comment heading is only the time: `date '+%F %H:%M'`. No author is kept.
+- The comment text uses no `## ` heading and no line of the form `### <date time>`; the UI splits comments on these headings.
+- `## Yorumlar` is always the last section. When adding a line to `## Notlar`, add it before that.
 
-İş, başka alanı ilgilendirmediği için kapatılan bir haber işiyse (Bağlamında `Kaynak: ÖNEK-N` ya da `### Kaynak` var) kod kontrolü gerekmez; not `**Sonuç:** İlgilendirmiyor. <tek cümle neden>` olur.
+If the task is a notice task being closed because it doesn't concern the other area (its Bağlam has `Source: PREFIX-N` or `### Kaynak`), no code check is needed; the note becomes `**Outcome:** Not affected. <why, in one sentence>`.
 
-Kapatılmayıp vazgeçilen iş `done` değil `cancelled` olur; nedeni `## Notlar`'a yazılır.
+A task that is abandoned rather than closed becomes `cancelled`, not `done`; the reason is written in `## Notlar`.
 
-## Adım 5: Karar ve bilgi
+## Step 5: Decision and knowledge
 
-Sırayla bak; cevabı biliyorsan öner, onaylat.
+Go through them in order; if you know the answer, propose it and get it approved.
 
-- **Kalıcı bir karar verildi mi?** "Şunu şu yüzden böyle yaptık" cümlesi kurulabiliyorsa `docs/decisions/NNNN-kisa-baslik.md` aç (sıradaki numara: `ls docs/decisions | tail -1`). Biçim mevcut kararlarla aynı: `# NNNN · Başlık`, `- **Tarih:**`, `- **Durum:** kabul`, `- **İlgili:** ÖNEK-N`, ardından `## Bağlam`, `## Karar`, `## Sonuçlar`. Yalnız tek bir alt klasörü ilgilendiren ve o klasörün kendi `CLAUDE.md`'si olan kural oraya yazılır.
-- **Bilgi eskidi mi?** İş, `docs/knowledge/`'taki bir sayfanın ya da `CLAUDE.md`'nin anlattığı akışa dokunduysa o sayfayı güncelle. Baştan yazma; yalnız eskiyen kısmı değiştir. `bunx sutlac check` belgelerdeki eskimiş yolları yakalar.
+- **Was a lasting decision made?** If the sentence "we did this that way because of this" can be formed, open `docs/decisions/NNNN-short-title.md` (next number: `ls docs/decisions | tail -1`). The format is the same as the existing decisions: `# NNNN · Title`, `- **Tarih:**` (date), `- **Durum:** kabul` (status: accepted), `- **İlgili:** PREFIX-N` (related), followed by `## Bağlam`, `## Karar` (decision), `## Sonuçlar` (consequences). A rule that concerns only a single subfolder, where that folder has its own `CLAUDE.md`, is written there.
+- **Has knowledge gone stale?** If the task touched a flow described by a page in `docs/knowledge/` or by `CLAUDE.md`, update that page. Don't rewrite it from scratch; change only the stale part. `bunx sutlac check` catches stale paths in the docs.
 
-## Adım 6: Commit ve özet
+## Step 6: Commit and summary
 
-İş dosyası (ve açılan iş, karar, bilgi değişiklikleri) iş henüz commit edilmediyse aynı commit'e girer; edildiyse ayrı bir `docs:` commit'i olur. Commit'ten önce mesajı göster ve onay al.
+The task file (and any opened task, decision or knowledge changes) goes into the same commit if the work hasn't been committed yet; if it has, it becomes a separate `docs:` commit. Show the message and get approval before committing.
 
-Özet üç satır: iş kapandı mı (ya da `review`'da neyin denenmesi bekleniyor), hangi kontroller çalıştı, hangi doküman açıldı ya da güncellendi. Sırada ne olduğunu sorma; `/is-baslat` bunun için var.
+The summary is three lines: whether the task closed (or what is waiting to be tried in `review`), which checks ran, which doc was opened or updated. Don't ask what's next; `/is-baslat` is there for that.
 
-## Kurallar
+## Rules
 
-- Kontroller yeşil değilse kapatma yok (ilgilendirmeyen haber işi hariç).
-- Karşılanmamış kriter, kanıtsız Kabul maddesi ya da cevapsız soru varsa kapatma yok. Yalnız gerçek ortamda denenmeyi bekleyen madde varsa iş `done` değil `review` olur.
-- Onaysız ve aramasız iş açma (`/is-ac`).
-- Kapanış notu yorumdur; gövdeye yazılmaz.
-- Karar ve bilgi burada güncellenmezse hiç güncellenmez; Adım 5'i atlama.
+- No close if the checks aren't green (except a notice task that doesn't concern the area).
+- No close if there is an unmet criterion, a Kabul item without evidence or an unanswered question. If the only thing left is an item waiting to be tried in the real environment, the task becomes `review`, not `done`.
+- Don't open a task without approval and without a search (`/is-ac`).
+- The closing note is a comment; it is not written in the body.
+- If decisions and knowledge aren't updated here, they are never updated; don't skip Step 5.

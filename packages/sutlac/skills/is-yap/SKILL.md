@@ -1,104 +1,104 @@
 ---
 name: is-yap
-description: Alt oturumda (worktree'de), ana oturumun /is-dagit ile verdiği tek bir işi yapmak için kullan. İşi ana kopyadan okur, kendi dalında geliştirir, dener, kontrolleri çalıştırır, commit atar ve sonucu, kanıtları ve bulunan hataları .worktree/rapor.md'ye yazar. docs/'a dokunmaz.
-argument-hint: "ÖNEK-N"
+description: Use in a sub-session (in a worktree) to do the single task the main session handed out with /is-dagit. Reads the task from the main checkout, develops it on its own branch, tries it, runs the checks, commits, and writes the result, the evidence and any bugs found to .worktree/rapor.md. Does not touch docs/.
+argument-hint: "PREFIX-N"
 ---
 
-# Alt oturumda işi yap
+# Do the task in a sub-session
 
-> **Önek ve proje bilgisi.** Aşağıda `ÖNEK-N` bir iş numarasıdır; önek `docs/config.json` > `prefix` alanındadır (ör. `KES` → `KES-12`, dosyası `docs/tasks/KES-12.md`). Komutlarda `ÖNEK` yerine gerçek öneki yaz. Projeye özgü her şey (kontrol komutu, alanlar/uygulamalar, deneme hesapları, paralel çalışmanın tuzakları) kök `CLAUDE.md`'de ve `docs/knowledge/`'tadır; bu skill onları oradan okur, ezbere varsaymaz.
+> **Prefix and project info.** Below, `PREFIX-N` is a task number; the prefix is in `docs/config.json` > `prefix` (e.g. `KES` → `KES-12`, file `docs/tasks/KES-12.md`). In commands, write the real prefix in place of `PREFIX`. Everything project-specific (the check command, areas/apps, test accounts, the pitfalls of parallel work) is in the root `CLAUDE.md` and in `docs/knowledge/`; this skill reads it from there and does not assume it from memory.
 
-## Adım 0: Yer
+## Step 0: Location
 
 ```bash
-git rev-parse --path-format=absolute --git-common-dir   # ana kopya = bunun üst klasörü
+git rev-parse --path-format=absolute --git-common-dir   # main checkout = the parent folder of this
 git branch --show-current
 ```
 
-`.git` bir dizinse ana kopyadasın: dur, bu skill ana kopyada çalışmaz (ana kopyada `/is-baslat`). Dal adı projenin ana dalıysa (`main`) dur: alt oturum kendi dalında çalışır.
+If `.git` is a directory you are in the main checkout: stop, this skill does not run in the main checkout (use `/is-baslat` there). If the branch name is the project's main branch (`main`), stop: a sub-session works on its own branch.
 
-Projenin worktree kurulumu varsa (`scripts/worktree-setup.sh`; oturum başında hook çalıştırır) çıktısındaki port ve veri bilgisini kullan. Rapor için `.worktree/` klasörü olmalı (`mkdir -p .worktree`; git'e girmez).
+If the project has a worktree setup (`scripts/worktree-setup.sh`; a hook runs it at session start), use the port and data information in its output. The `.worktree/` folder must exist for the report (`mkdir -p .worktree`; it does not go into git).
 
-## Adım 1: İşi oku
+## Step 1: Read the task
 
-İş dosyasını **ana kopyadan** oku: `<ana kopya>/docs/tasks/ÖNEK-N.md` (worktree'deki kopya dağıtımdan önceki commit'tedir; durum ve son yorumlar ana kopyada). Baştan sona: Bağlam, Kabul, Yapılacaklar, Notlar, Yorumlar; tasarım yorumu varsa o üzerinde anlaşılmış tasarımdır. Brief'teki "Kapsam" ve "Dokunma" satırları sınırdır.
+Read the task file **from the main checkout**: `<main checkout>/docs/tasks/PREFIX-N.md` (the copy in the worktree is at the commit from before the hand-out; the status and the latest comments are in the main checkout). From start to finish: `## Bağlam` (context), `## Kabul` (acceptance criteria), `## Yapılacaklar` (to-dos), `## Notlar` (notes), `## Yorumlar` (comments); if there is a design comment, that is the agreed design. The "Scope" and "Don't touch" lines in the brief are the boundary.
 
-Kök `CLAUDE.md`'yi ve değiştireceğin alt klasörün kendi `CLAUDE.md`'si varsa onu oku.
+Read the root `CLAUDE.md` and, if the subfolder you will change has its own `CLAUDE.md`, that one too.
 
-Brief ile iş dosyası çelişiyorsa ya da tasarım kararı gerekiyorsa: kullanıcıya bu oturumda sor (`AskUserQuestion`); cevabı rapordaki "Sorulanlar"a yaz. Ana oturumun dosyalarına yazma.
+If the brief and the task file contradict each other, or a design decision is needed: ask the user in this session (`AskUserQuestion`); write the answer under "Questions asked" in the report. Do not write to the main session's files.
 
-## Adım 2: Geliştir
+## Step 2: Develop
 
-- Kapsam dışına çıkma. Yolda bulunan hata ya da iyileştirme **düzeltilmez**, rapordaki "Bulgular"a yazılır (Adım 4). Tek istisna: işi engelleyen hata; o zaman düzelt ve raporda ayrıca söyle.
-- `docs/` ve kök `CLAUDE.md` yazılmaz (hook engeller). Alt klasörün kendi `CLAUDE.md`'si kodla birlikte değişmesi gerekiyorsa değiştirilir ve raporda söylenir.
-- Üretilen dosyası olan bir şey değiştiyse (şema, tip, sözleşme) üretim komutunu çalıştır; çıktılar aynı commit'e girer.
-- Bağımlılık eklemek kilit dosyasını değiştirir; gerekli değilse ekleme, gerekliyse raporda söyle (merge'de çakışabilir).
+- Do not go out of scope. A bug or improvement found along the way is **not fixed**; it is written under "Findings" in the report (Step 4). The only exception: a bug that blocks the task; then fix it and say so separately in the report.
+- `docs/` and the root `CLAUDE.md` are not written (the hook blocks it). A subfolder's own `CLAUDE.md` is changed if it has to change together with the code, and the report says so.
+- If something that has generated files changed (schema, type, contract), run the generation command; the outputs go into the same commit.
+- Adding a dependency changes the lock file; do not add one unless necessary, and if necessary say so in the report (it may conflict at merge).
 
-## Adım 3: Dene ve kontrol et
+## Step 3: Try and check
 
-- Dev sunucusu ve önizleme yalnız bu worktree'nin kendi portlarıyla; ana kopyanın çalışan sunucusuna, veritabanına ve dosyalarına yazma. Projenin paralel çalışma kuralları (port, veri kopyası, ortak ve uzak kaynaklar, deneme hesapları) kök `CLAUDE.md`'de ya da `docs/knowledge/`'tadır; oradakine uy, kullanıcıdan şifre isteme.
-- Tek kopya olan kaynakları (cihaz, simülatör, paylaşılan uzak servis) kullanma. Orada görülmesi gereken Kabul maddesi raporda ⏳ kalır ve nasıl deneneceği yazılır.
-- Kontroller: projenin kontrol komutu (kök `CLAUDE.md`; ör. `bun run check`). Kırmızıysa düzelt; düzeltemiyorsan rapora `Durum: takıldı` yaz.
+- Dev server and preview only on this worktree's own ports; do not write to the main checkout's running server, database or files. The project's parallel-work rules (port, data copy, shared and remote resources, test accounts) are in the root `CLAUDE.md` or in `docs/knowledge/`; follow what is there, do not ask the user for passwords.
+- Do not use single-copy resources (device, simulator, shared remote service). A Kabul item that has to be seen there stays ⏳ in the report, with how to try it.
+- Checks: the project's check command (root `CLAUDE.md`; e.g. `bun run check`). If it is red, fix it; if you cannot, write `Status: stuck` in the report.
 
-## Adım 4: Commit ve rapor
+## Step 4: Commit and report
 
-Commit bu skill'in parçasıdır (kullanıcı `/is-dagit` ile istedi): yalnız bu dala, projenin commit biçimiyle (kök `CLAUDE.md`), mesajda `ÖNEK-N`. push yok, main'e dokunma, rebase/merge yapma (ana oturum `/is-topla` ile yapar).
+Committing is part of this skill (the user asked for it with `/is-dagit`): only to this branch, in the project's commit format (root `CLAUDE.md`), with `PREFIX-N` in the message. No push, do not touch main, do not rebase/merge (the main session does that with `/is-topla`).
 
-Sonra `.worktree/rapor.md`'yi bu şablonla yaz (varsa üzerine):
+Then write `.worktree/rapor.md` with this template (overwrite if it exists):
 
 ```md
-# ÖNEK-N rapor
+# PREFIX-N report
 
-- Dal: <dal> · Commit'ler: <kısa hash> <başlık>, ...
-- Durum: hazır | takıldı (<neden>)
-- Değişen alanlar: <etiketler>
+- Branch: <branch> · Commits: <short hash> <subject>, ...
+- Status: ready | stuck (<reason>)
+- Areas changed: <tags>
 
-## Yapılan
-İki-üç cümle: ne değişti, neden bu yol.
+## What changed
+Two or three sentences: what changed, why this approach.
 
-## Kabul
-1. ✓ <kanıt: test adı, komut çıktısı, önizlemede görülen>
-2. ⏳ <cihaz / canlı veri gerektiriyor; nasıl denenecek>
-3. ✗ <karşılanmadı; neden>
+## Acceptance
+1. ✓ <evidence: test name, command output, what was seen in the preview>
+2. ⏳ <needs a device / live data; how to try it>
+3. ✗ <not met; why>
 
-## Kontroller
-`<kontrol komutu>`: <sonuç, test sayıları>
+## Checks
+`<check command>`: <result, test counts>
 
-## Diğer alanlara etki
-Yok / <uç, alan, davranış; hangi uygulama ya da paket, ne yapılmalı>
+## Impact on other areas
+None / <endpoint, field, behavior; which app or package, what should be done>
 
-## Bulgular
-İş adayları; ana oturum /is-ac ile arayıp açar. Her biri:
-### <davranışı anlatan başlık cümlesi>
-- tags: <docs/config.json'daki etiketler>
-- Belirti: <ürün diliyle>
-- Yeniden üretme: 1. ... 2. ... (rol, hesap, veri)
-- Önerilen Kabul: <gözlenebilir iddia>
-- Kanıt ve yer: <hata çıktısı, dosya:satır>
+## Findings
+Task candidates; the main session searches and opens them with /is-ac. Each one:
+### <title sentence describing the behavior>
+- tags: <tags from docs/config.json>
+- Symptom: <in product language>
+- Steps to reproduce: 1. ... 2. ... (role, account, data)
+- Suggested acceptance: <observable claim>
+- Evidence and location: <error output, file:line>
 
-## Doküman önerileri
-`docs/knowledge/`, `docs/decisions/` ya da kök `CLAUDE.md` için öneri; değiştirilen alt klasör `CLAUDE.md`'si.
+## Doc suggestions
+Suggestions for `docs/knowledge/`, `docs/decisions/` or the root `CLAUDE.md`; any subfolder `CLAUDE.md` that was changed.
 
-## Sorulanlar
-- Soru: ... · Seçim: ... · Sorulmasaydı: ...
+## Questions asked
+- Question: ... · Choice: ... · If not asked: ...
 ```
 
-Boş bölüm "Yok" yazar; silinmez.
+An empty section says "None"; it is not removed.
 
-## Adım 5: Bitir
+## Step 5: Finish
 
-Son mesaj kısa olsun; ana oturuma ilk 400 karakteri ulaşır:
+Keep the final message short; the first 400 characters reach the main session:
 
 ```
-ÖNEK-N hazır · dal <dal> · <n> commit · check ✓ · Kabul ✓3 ⏳1 · bulgu 2
-Rapor: <worktree mutlak yolu>/.worktree/rapor.md
+PREFIX-N ready · branch <branch> · <n> commits · check ✓ · Acceptance ✓3 ⏳1 · findings 2
+Report: <absolute worktree path>/.worktree/rapor.md
 ```
 
-Sonra dur. Ana oturum geri bildirim gönderirse (`SendMessage`) düzelt, yeni commit at, raporu güncelle.
+Then stop. If the main session sends feedback (`SendMessage`), fix it, make a new commit, update the report.
 
-## Kurallar
+## Rules
 
-- docs/ ve kök CLAUDE.md yazılmaz; bulgu ve öneri rapora.
-- Kapsam dışı düzeltme yok; bulgu olarak yazılır.
-- Kendi portları ve verisi; tek kopya kaynak yok; push yok; ana dala dokunma.
-- Kanıtsız ✓ yok (`/is-kapat` ile aynı ölçü).
+- docs/ and the root CLAUDE.md are not written; findings and suggestions go in the report.
+- No out-of-scope fixes; they are written as findings.
+- Own ports and data; no single-copy resources; no push; do not touch the main branch.
+- No ✓ without evidence (the same bar as `/is-kapat`).

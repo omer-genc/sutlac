@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
-# PreToolUse: worktree'deki (alt) oturum docs/ ve kök CLAUDE.md'ye yazamaz.
-# İş durumu, yorum, yeni iş, bilgi ve karar ana oturumda güncellenir; alt oturum
-# bunları .worktree/rapor.md'ye yazar. Ana kopyada hiçbir şeyi engellemez.
+# PreToolUse: a session in a worktree (sub-session) cannot write to docs/ or the root CLAUDE.md.
+# Task status, comments, new tasks, knowledge and decisions are updated in the main session; the
+# sub-session writes them to .worktree/rapor.md. Blocks nothing in the main checkout.
 r="${CLAUDE_PROJECT_DIR:-}"
-[ -n "$r" ] && [ -f "$r/.git" ] || exit 0 # worktree'de .git bir dosyadır; ana kopyada dizin
+[ -n "$r" ] && [ -f "$r/.git" ] || exit 0 # in a worktree .git is a file; in the main checkout a directory
 command -v jq >/dev/null 2>&1 || exit 0
 
 input=$(cat)
 tool=$(jq -r '.tool_name // empty' <<<"$input")
-msg="Alt oturum (worktree) docs/ ve kök CLAUDE.md'ye yazmaz: iş durumu, yorum, yeni iş, bilgi ve karar ana oturumun işi. Bunu .worktree/rapor.md'ye yaz (Bulgular / Doküman önerileri)."
+msg="A sub-session (worktree) does not write to docs/ or the root CLAUDE.md: task status, comments, new tasks, knowledge and decisions belong to the main session. Write this to .worktree/rapor.md instead (Findings / Doc suggestions)."
 
 if [ "$tool" = "Bash" ]; then
   cmd=$(jq -r '.tool_input.command // empty' <<<"$input")
-  # Yalnız docs/'a ya da kök CLAUDE.md'ye yazan biçimler: yönlendirme, tee, sed/perl -i, mv/cp/rm, git mv/rm.
+  # Only the forms that write to docs/ or the root CLAUDE.md: redirection, tee, sed/perl -i, mv/cp/rm, git mv/rm.
   target='[^|;&]*((^|[ /"'"'"'])docs/|(^|[ "'"'"'])(\./)?CLAUDE\.md)'
   if grep -Eq "(>>?|tee( -a)?)[[:space:]]*[^|;&[:space:]]*docs/|(sed|perl)[[:space:]]+-[a-zA-Z]*i$target|(^|[;&|[:space:]])(mv|cp|rm|touch)[[:space:]]$target|git[[:space:]]+(mv|rm)[[:space:]]$target" <<<"$cmd"; then
     echo "$msg" >&2

@@ -1,143 +1,143 @@
 <!doctype html>
-<html lang="tr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
-    <title>Sütlaç · repodaki docs/ klasöründe iş takibi</title>
-    <meta name="description" content="İşler, sprintler ve kararlar repodaki markdown dosyalarıdır. Sütlaç onlara yerel bir board, bir komut satırı ve Claude Code skill'leri ekler." />
+    <title>Sütlaç · issue tracking in your repo's docs/ folder</title>
+    <meta name="description" content="Tasks, sprints and decisions are markdown files in your repo. Sütlaç adds a local board, a CLI and Claude Code skills on top of them." />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header class="top">
-      <a class="brand" href="#top" aria-label="Sütlaç ana sayfa"><span class="bowl" aria-hidden="true"></span>sütlaç</a>
-      <nav aria-label="Bölümler">
-        <a href="#kurulum">Kurulum</a>
-        <a href="#akis">Skill'ler</a>
-        <a href="#komutlar">Komutlar</a>
-        <a href="#dosyalar">Dosya biçimi</a>
+      <a class="brand" href="#top" aria-label="Sütlaç home"><span class="bowl" aria-hidden="true"></span>sütlaç</a>
+      <nav aria-label="Sections">
+        <a href="#install">Install</a>
+        <a href="#flow">Skills</a>
+        <a href="#commands">Commands</a>
+        <a href="#files">File format</a>
       </nav>
     </header>
 
     <main id="top">
       <section class="hero">
-        <p class="eyebrow">Dış araç yok · MCP yok · yalnız markdown</p>
-        <h1>İş takibi, repodaki <code>docs/</code> klasöründe.</h1>
+        <p class="eyebrow">No external service · no MCP · just markdown</p>
+        <h1>Issue tracking, in your repo's <code>docs/</code> folder.</h1>
         <p class="lead">
-          Her iş bir <code>.md</code> dosyasıdır; kodla aynı commit'e girer, aynı dalda gezer, <code>grep</code> ile aranır. Sütlaç bu klasöre yerel bir board, bir komut satırı ve
-          işi açan, dağıtan, toplayan, kapatan Claude Code skill'leri ekler.
+          Every task is a <code>.md</code> file: it lands in the same commit as the code, travels on the same branch and is searchable with <code>grep</code>. Sütlaç adds a local board, a
+          CLI and Claude Code skills that open, hand out, collect and close the work.
         </p>
-        <pre class="cmd" aria-label="Hızlı başlangıç"><code><span class="p">$</span> bunx sutlac init --prefix KES
+        <pre class="cmd" aria-label="Quick start"><code><span class="p">$</span> bunx sutlac init --prefix KES
 <span class="p">$</span> bunx sutlac</code></pre>
 
-        <div class="board" role="img" aria-label="Board örneği: Todo, In Progress, Review ve Done kolonlarında iş kartları">
+        <div class="board" role="img" aria-label="Board example: task cards in Todo, In Progress, Review and Done columns">
           <div class="col">
             <h3><i class="dot blue"></i>Todo <b>2</b></h3>
-            <div class="card"><small>KES-146 · <em class="hi">high</em></small>Sipariş detayında kalemler listelenmiyor<span class="tag teal">mobile</span></div>
-            <div class="card"><small>KES-151</small>Liste uçlarına günlük önbellek<span class="tag purple">api</span></div>
+            <div class="card"><small>KES-146 · <em class="hi">high</em></small>Order detail doesn't list line items<span class="tag teal">mobile</span></div>
+            <div class="card"><small>KES-151</small>Daily cache for list endpoints<span class="tag purple">api</span></div>
           </div>
           <div class="col">
             <h3><i class="dot amber"></i>In Progress <b>1</b></h3>
-            <div class="card"><small>KES-120</small>Sipariş durumu yanlış görünüyor<span class="tag teal">mobile</span><span class="tag purple">api</span></div>
+            <div class="card"><small>KES-120</small>Order status shows the wrong value<span class="tag teal">mobile</span><span class="tag purple">api</span></div>
           </div>
           <div class="col">
             <h3><i class="dot purple"></i>Review <b>1</b></h3>
-            <div class="card"><small>KES-98 · 💬 2</small>Şube kullanıcısı yalnız kendi siparişlerini görür<span class="tag orange">web</span></div>
+            <div class="card"><small>KES-98 · 💬 2</small>Branch users only see their own orders<span class="tag orange">web</span></div>
           </div>
           <div class="col">
             <h3><i class="dot green"></i>Done <b>1</b></h3>
-            <div class="card done"><small>KES-87</small>Giriş hız sınırı<span class="tag purple">api</span></div>
+            <div class="card done"><small>KES-87</small>Login rate limit<span class="tag purple">api</span></div>
           </div>
         </div>
       </section>
 
       <section class="three">
         <article>
-          <h2>Arayüz</h2>
-          <p>Board, backlog, sprintler, arşiv ve doküman ağacı. Kart sürüklemek <code>status</code> alanını yazar; editör yalnız değişen bloğu yeniden yazar, dosyanın geri kalanı elle yazıldığı gibi kalır.</p>
+          <h2>UI</h2>
+          <p>Board, backlog, sprints, archive and a docs tree. Dragging a card writes the <code>status</code> field; the editor rewrites only the block you changed and leaves the rest of the file exactly as it was written.</p>
         </article>
         <article>
-          <h2>Komut satırı</h2>
-          <p><code>list</code>, <code>next</code>, <code>check</code>: agent'ın da insanın da aynı cevabı tek satırda aldığı küçük komutlar. Çalışma anında bağımlılık yok, yalnız Bun.</p>
+          <h2>CLI</h2>
+          <p><code>list</code>, <code>next</code>, <code>check</code>: small commands that give an agent and a human the same one-line answer. No runtime dependencies, just Bun.</p>
         </article>
         <article>
-          <h2>Skill'ler</h2>
-          <p>Altı skill işin bütün ömrünü taşır: arayıp açmak, üstlenmek, paralel oturumlara dağıtmak, worktree'de yapmak, toplayıp main'e almak, kanıtla kapatmak.</p>
+          <h2>Skills</h2>
+          <p>Six skills carry a task through its whole life: search and open, pick up, hand out to parallel sessions, do it in a worktree, collect and merge, close with evidence.</p>
         </article>
       </section>
 
-      <section id="kurulum">
-        <h2>Kurulum</h2>
+      <section id="install">
+        <h2>Install</h2>
         <ol class="steps">
           <li>
-            <h3>Klasörü kur</h3>
-            <p>Repo kökünde çalıştır. <code>docs/config.json</code>, biçim belgeleri ve boş klasörler oluşur; var olan dosyaya dokunmaz.</p>
+            <h3>Set up the folder</h3>
+            <p>Run it at the repo root. It creates <code>docs/config.json</code>, the format docs and empty folders, and never touches a file that already exists.</p>
             <pre><code>bun add -d sutlac
-bunx sutlac init --prefix KES --title "Keskin Docs"</code></pre>
+bunx sutlac init --prefix KES --title "Project Docs"</code></pre>
           </li>
           <li>
-            <h3>Skill'leri ekle</h3>
-            <p>Claude Code eklentisi olarak (skill'ler <code>/sutlac:is-ac</code> diye görünür, hook'lar kendiliğinden gelir):</p>
+            <h3>Add the skills</h3>
+            <p>As a Claude Code plugin (skills appear as <code>/sutlac:is-ac</code>, hooks come along):</p>
             <pre><code>/plugin marketplace add omer-genc/sutlac
 /plugin install sutlac@sutlac</code></pre>
-            <p>ya da dosyaları repoya kopyalayarak (<code>.claude/skills/</code>, <code>.claude/hooks/sutlac/</code>, <code>settings.json</code>):</p>
+            <p>or by copying the files into the repo (<code>.claude/skills/</code>, <code>.claude/hooks/sutlac/</code>, <code>settings.json</code>):</p>
             <pre><code>bunx sutlac skills</code></pre>
           </li>
           <li>
-            <h3>Projeyi tanıt</h3>
-            <p>Skill'ler projeye özgü hiçbir şeyi ezbere bilmez. Kök <code>CLAUDE.md</code>'ye kontrol komutunu (ör. <code>bun run check</code>), commit biçimini ve varsa paralel çalışma kurallarını yaz; oradan okurlar.</p>
+            <h3>Describe your project</h3>
+            <p>The skills assume nothing project-specific. Put your check command (e.g. <code>bun run check</code>), commit style and any parallel-work rules in the root <code>CLAUDE.md</code>; they read it from there.</p>
           </li>
         </ol>
       </section>
 
-      <section id="akis">
-        <h2>Bir işin ömrü</h2>
-        <p class="sub">Ana oturum planlar, karar verir ve <code>docs/</code>'u yalnız o yazar. Alt oturumlar kendi worktree'lerinde yalnız işi yapar ve rapor bırakır.</p>
+      <section id="flow">
+        <h2>The life of a task</h2>
+        <p class="sub">The main session plans, decides and is the only one that writes <code>docs/</code>. Sub-sessions work in their own worktrees, do the task and leave a report.</p>
         <ol class="flow">
-          <li><code>/is-ac</code><b>Aç</b><span>Önce mevcut işlerde arar; eşleşme varsa yeni iş açmaz. Davranışı ürün diliyle, gözlenebilir Kabul maddeleriyle yazar.</span></li>
-          <li><code>/is-baslat</code><b>Başlat</b><span>Aktif sprinti ve backlog'u özetler, seçilen işi <code>in-progress</code>'e alır, kodu okuyup ne yapacağını anlatır.</span></li>
-          <li><code>/is-dagit</code><b>Dağıt</b><span>Birbirine dokunmayan işleri çakışma kontrolünden geçirip her biri için ayrı worktree oturumu başlatır.</span></li>
-          <li><code>/is-yap</code><b>Yap</b><span>Alt oturumda: kendi dalında geliştirir, dener, commit atar; kanıtı ve bulduğu hataları <code>.worktree/rapor.md</code>'ye yazar.</span></li>
-          <li><code>/is-topla</code><b>Topla</b><span>Raporu diff'e karşı denetler, onayla main'e alır, kontrolleri çalıştırır, rapordaki bulguları iş olarak açar.</span></li>
-          <li><code>/is-kapat</code><b>Kapat</b><span>Her Kabul maddesi için kanıt ister. Gerçek ortamda denenmesi kalan iş <code>done</code> değil <code>review</code> olur.</span></li>
+          <li><code>/is-ac</code><b>Open</b><span>Searches existing tasks first and doesn't open a duplicate. Describes behaviour in product terms, with observable acceptance criteria.</span></li>
+          <li><code>/is-baslat</code><b>Start</b><span>Summarises the active sprint and backlog, moves the chosen task to <code>in-progress</code>, reads the code and says what it plans to do.</span></li>
+          <li><code>/is-dagit</code><b>Hand out</b><span>Checks that tasks don't overlap, then starts a separate worktree session for each one.</span></li>
+          <li><code>/is-yap</code><b>Do</b><span>In the sub-session: builds on its own branch, tests, commits, and writes evidence and any bugs it found to <code>.worktree/rapor.md</code>.</span></li>
+          <li><code>/is-topla</code><b>Collect</b><span>Checks the report against the diff, merges with your approval, runs the checks and files the report's findings as tasks.</span></li>
+          <li><code>/is-kapat</code><b>Close</b><span>Asks for evidence for every acceptance criterion. A task that still needs trying in a real environment becomes <code>review</code>, not <code>done</code>.</span></li>
         </ol>
       </section>
 
-      <section id="komutlar">
-        <h2>Komutlar</h2>
+      <section id="commands">
+        <h2>Commands</h2>
         <div class="table">
           <table>
-            <thead><tr><th scope="col">Komut</th><th scope="col">Ne yapar</th></tr></thead>
+            <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
             <tbody>
-              <tr><td><code>sutlac</code></td><td>Arayüzü açar. <code>--port 4400</code>, <code>--no-open</code>, <code>--dir &lt;docs&gt;</code></td></tr>
-              <tr><td><code>sutlac init</code></td><td><code>docs/</code> iskeletini kurar. <code>--prefix</code>, <code>--title</code>, <code>--dir</code></td></tr>
-              <tr><td><code>sutlac list</code></td><td>Açık işler, satır başına bir iş. <code>--all</code>, <code>--tag</code>, <code>--json</code></td></tr>
-              <tr><td><code>sutlac next</code></td><td>Sıradaki iş numarası</td></tr>
-              <tr><td><code>sutlac check</code></td><td>Belgelerde (CLAUDE.md, skill, agent, knowledge) geçen yollar ve resim bağlantıları repoda mı</td></tr>
-              <tr><td><code>sutlac skills</code></td><td>Skill ve hook'ları <code>.claude/</code> altına kopyalar. <code>--no-hooks</code>, <code>--to</code></td></tr>
+              <tr><td><code>sutlac</code></td><td>Opens the UI. <code>--port 4400</code>, <code>--no-open</code>, <code>--dir &lt;docs&gt;</code></td></tr>
+              <tr><td><code>sutlac init</code></td><td>Creates the <code>docs/</code> skeleton. <code>--prefix</code>, <code>--title</code>, <code>--dir</code></td></tr>
+              <tr><td><code>sutlac list</code></td><td>Open tasks, one per line. <code>--all</code>, <code>--tag</code>, <code>--json</code></td></tr>
+              <tr><td><code>sutlac next</code></td><td>Next task number</td></tr>
+              <tr><td><code>sutlac check</code></td><td>Verifies that paths and image links mentioned in your docs (CLAUDE.md, skills, agents, knowledge) exist in the repo</td></tr>
+              <tr><td><code>sutlac skills</code></td><td>Copies the skills and hooks into <code>.claude/</code>. <code>--no-hooks</code>, <code>--to</code></td></tr>
             </tbody>
           </table>
         </div>
         <pre><code><span class="p">$</span> bunx sutlac list
-# active sprint: 3 Sprint 3 — Ödeme akışı
+# active sprint: 3 Sprint 3 — Checkout flow
 # task|status|priority|tags|sprint|title|comments|last comment
-KES-120|in-progress|normal|mobile,api|3|Sipariş durumu yanlış görünüyor|0|
-KES-98|review|normal|web|3|Şube kullanıcısı yalnız kendi siparişlerini görür|2|2026-01-15 21:30</code></pre>
+KES-120|in-progress|normal|mobile,api|3|Order status shows the wrong value|0|
+KES-98|review|normal|web|3|Branch users only see their own orders|2|2026-01-15 21:30</code></pre>
       </section>
 
-      <section id="dosyalar">
-        <h2>Dosya biçimi</h2>
+      <section id="files">
+        <h2>File format</h2>
         <div class="split">
           <pre><code>docs/
-├─ config.json     önek, etiketler, durumlar
+├─ config.json     prefix, tags, statuses
 ├─ tasks/          KES-1.md, KES-2.md …
 ├─ sprints/        sprint-1.md …
-├─ knowledge/      kalıcı bilgi
-├─ decisions/      0001-kisa-baslik.md
-└─ images/         &lt;içerik özeti&gt;.png</code></pre>
+├─ knowledge/      lasting knowledge
+├─ decisions/      0001-short-title.md
+└─ images/         &lt;content hash&gt;.png</code></pre>
           <pre><code>---
 id: KES-12
-title: Sipariş listesi şube kapsamını uygulamıyor
+title: Order list ignores the branch scope
 status: todo
 tags: [api, web]
 priority: normal
@@ -148,19 +148,19 @@ closed:
 
 ## Bağlam
 ## Kabul
-1. Şube kullanıcısı yalnız kendi şubesini görür.
+1. Branch users only see their own branch.
 
 ## Yorumlar
 ### 2026-01-15 21:30
-Kapanış notu, kanıtlarıyla.</code></pre>
+Closing note, with the evidence.</code></pre>
         </div>
-        <p class="sub">İşin yeri hiç değişmez; biten iş de yerinde kalır, böylece <code>KES-12</code> atıfları kırılmaz. Arşiv hesaplanır, dosya taşınmaz.</p>
+        <p class="sub">A task never moves; a finished one stays where it is, so <code>KES-12</code> references don't break. The archive is computed, files aren't moved. Section headings (<code>## Bağlam</code> context, <code>## Kabul</code> acceptance, <code>## Yorumlar</code> comments) are part of the format and are Turkish.</p>
       </section>
     </main>
 
     <footer>
       <span>sütlaç · MIT</span>
-      <span>Bun ile çalışır</span>
+      <span>Runs on Bun</span>
     </footer>
   </body>
 </html>

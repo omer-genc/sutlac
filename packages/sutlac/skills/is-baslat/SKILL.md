@@ -1,97 +1,97 @@
 ---
 name: is-baslat
-description: Oturum başında ya da "nerede kalmıştık / sırada ne var" denince kullan - docs/tasks/'taki açık işleri aktif sprint ve backlog olarak özetler, yorumu olanları gösterir, seçilen işi in-progress'e alır. Argüman olarak etiket ya da iş numarası verilebilir.
-argument-hint: "[etiket | ÖNEK-N]"
+description: Use at the start of a session or when asked "where were we / what's next" - summarizes the open tasks in docs/tasks/ as active sprint and backlog, shows which ones have comments, and moves the chosen task to in-progress. A tag or a task number can be given as the argument.
+argument-hint: "[tag | PREFIX-N]"
 ---
 
-# İşe başla
+# Start work
 
-> **Önek ve proje bilgisi.** Aşağıda `ÖNEK-N` bir iş numarasıdır; önek `docs/config.json` > `prefix` alanındadır (ör. `KES` → `KES-12`, dosyası `docs/tasks/KES-12.md`). Komutlarda `ÖNEK` yerine gerçek öneki yaz. Projeye özgü her şey (kontrol komutu, alanlar/uygulamalar, deneme hesapları, paralel çalışmanın tuzakları) kök `CLAUDE.md`'de ve `docs/knowledge/`'tadır; bu skill onları oradan okur, ezbere varsaymaz.
+> **Prefix and project info.** Below, `PREFIX-N` is a task number; the prefix is in `docs/config.json` > `prefix` (e.g. `KES` → `KES-12`, file `docs/tasks/KES-12.md`). In commands, write the real prefix in place of `PREFIX`. Everything project-specific (the check command, areas/apps, test accounts, the pitfalls of parallel work) is in the root `CLAUDE.md` and in `docs/knowledge/`; this skill reads it from there and does not assume it from memory.
 
-"Nerede kalmıştık" sorusunu tek adımda cevaplar. Okuma aşamasında hiçbir dosyayı değiştirmez; tek yazma, kullanıcı bir iş seçtikten sonra onu üstlenmektir (Adım 4).
+Answers "where were we" in one step. Changes no file during the reading phase; the only write is claiming a task after the user picks one (Step 4).
 
-Biçim ve kurallar: `docs/tasks/README.md`, `docs/sprints/README.md`. Geçerli durum, etiket ve öncelikler `docs/config.json`'dadır; oradan oku, ezbere yazma.
+Format and rules: `docs/tasks/README.md`, `docs/sprints/README.md`. Valid statuses, tags and priorities are in `docs/config.json`; read them from there, don't write them from memory.
 
-## Adım 1: Kapsam
+## Step 1: Scope
 
-- `$ARGUMENTS` bir `ÖNEK-N` ise doğrudan Adım 4'e geç.
-- `docs/config.json` > `tags` içindeki bir etiketse yalnız `tags`'inde o geçen işleri göster (`--tag`).
-- Boşsa hepsini göster. Kullanıcıya "hangi alan?" diye sorma.
+- If `$ARGUMENTS` is a `PREFIX-N`, go straight to Step 4.
+- If it is a tag from `docs/config.json` > `tags`, show only the tasks that have it in their `tags` (`--tag`).
+- If it is empty, show everything. Don't ask the user "which area?".
 
-## Adım 2: Oku
+## Step 2: Read
 
-Tek komut açık işleri (kapalı sayılmayan durumdakiler) ve aktif sprinti verir; dosyaları tek tek açma:
+One command gives the open tasks (those in a status that doesn't count as closed) and the active sprint; don't open the files one by one:
 
 ```bash
-bunx sutlac list            # --tag <etiket> · --json
+bunx sutlac list            # --tag <tag> · --json
 ```
 
-Çıktı satır başına bir iştir: `task|status|priority|tags|sprint|title|comments|last comment`. İlk satır aktif sprinttir (`closed` alanı boş olan `docs/sprints/sprint-N.md`); yoksa her açık iş backlog'dadır. `sprint` alanı aktif sprintin numarası olan iş sprinttedir, boş olan backlog'da.
+The output is one task per line: `task|status|priority|tags|sprint|title|comments|last comment`. The first line is the active sprint (the `docs/sprints/sprint-N.md` whose `closed` field is empty); if there is none, every open task is in the backlog. A task whose `sprint` field is the active sprint's number is in the sprint, one whose field is empty is in the backlog.
 
-Komut yoksa (paket kurulu değil) aynı bilgi dosyalardan okunur: `grep -H -e '^status:' -e '^title:' -e '^tags:' -e '^sprint:' -e '^priority:' docs/tasks/ÖNEK-*.md`.
+If the command is missing (the package isn't installed), the same information is read from the files: `grep -H -e '^status:' -e '^title:' -e '^tags:' -e '^sprint:' -e '^priority:' docs/tasks/PREFIX-*.md`.
 
-## Adım 3: Özeti bas
+## Step 3: Print the summary
 
-Kısa tut, iş metnini basma: numara, öncelik, etiket, başlık yeter.
+Keep it short, don't print the task text: number, priority, tag and title are enough.
 
 ```
-## Açık işler (Sprint 3 — Ödeme akışı)
+## Open tasks (Sprint 3 — Payment flow)
 
-### Devam eden
-- ÖNEK-120 · mobile · Sipariş durumu yanlış görünüyor
+### In progress
+- PREFIX-120 · mobile · Order status is shown wrong
 
-### Review'da (denenmeyi bekliyor)
-- ÖNEK-1 · mobile · Mobili güncel API sözleşmesine geçir
+### In review (waiting to be tried)
+- PREFIX-1 · mobile · Move mobile to the current API contract
 
-### Engelli
-- ÖNEK-87 · api · Liste uçlarına günlük önbellek
+### Blocked
+- PREFIX-87 · api · Daily cache for list endpoints
 
-### Sprintte, sırada
-- ÖNEK-146 · high · mobile · Sipariş detayında kalemler listelenmiyor
-  💬 2 yorum, son: 2026-01-15 21:30
+### In the sprint, up next
+- PREFIX-146 · high · mobile · Order detail doesn't list the line items
+  💬 2 comments, last: 2026-01-15 21:30
 
 ### Backlog (14)
-- high: ÖNEK-2 · mobile, api · Ödeme sonrası bildirim gitmiyor
+- high: PREFIX-2 · mobile, api · No notification is sent after payment
 - api: 9 · mobile: 3 · web: 1
 ```
 
-- Önce `in-progress`, sonra `review`, sonra `blocked`, sonra aktif sprintin `todo`'ları; her grupta `high` önce. `review` iş kod tarafında bitmiştir; listede kullanıcının denemesini beklediği için görünür. Sprint ya da backlog fark etmez, `review`'daki her iş bu grupta yazılır.
-- Backlog'da yalnız `high` olanları tek tek yaz, kalanların etiket bazında sayısını ver. Kullanıcı isterse tamamını listele.
-- Yorumu olan işte yorum sayısını ve son yorumun zamanını (`### tarih saat` başlığı) göster. Yorumu özetleme ve cevaplama; varlığını göster, kullanıcı ilgilenirse açar.
-- Açık iş yoksa söyle.
+- First `in-progress`, then `review`, then `blocked`, then the active sprint's `todo` tasks; `high` first in each group. A `review` task is finished on the code side; it appears in the list because it is waiting for the user to try it. Sprint or backlog makes no difference: every task in `review` is written in this group.
+- In the backlog, write out only the `high` ones individually and give the count of the rest per tag. List all of them if the user asks.
+- For a task with comments, show the comment count and the time of the last comment (the `### date time` heading). Don't summarize or answer the comment; show that it exists, the user opens it if interested.
+- If there are no open tasks, say so.
 
-Ardından tek soru sor: hangisiyle başlıyoruz?
+Then ask a single question: which one do we start with?
 
-## Adım 4: Seçilen işi üstlen
+## Step 4: Claim the chosen task
 
-Kullanıcı bir iş seçtiğinde (ya da `/is-baslat` olmadan doğrudan "ÖNEK-N'e başlayalım" dediğinde) dosyayı **baştan sona** oku: Bağlam, Kabul, Yapılacaklar, Notlar ve `## Yorumlar`. Yorumlar gövde kadar önemlidir; gövdeyle çelişen sonraki bir yorum gövdenin yerini alır. Bağlam'da geçen `ÖNEK-N`'leri de aç.
+When the user picks a task (or says "let's start PREFIX-N" directly, without `/is-baslat`), read the file **from top to bottom**: `## Bağlam` (context), `## Kabul` (acceptance criteria), `## Yapılacaklar` (to-dos), `## Notlar` (notes) and `## Yorumlar` (comments). The comments matter as much as the body; a later comment that contradicts the body replaces the body. Also open the `PREFIX-N`s mentioned in Bağlam.
 
-**Kapılar**, yazmadan önce:
+**Gates**, before writing:
 
-- `status` `todo` değilse dokunma. Zaten `in-progress` ise devam et. `review` ise son kapanış yorumundaki `⏳` maddeleri göster ve sor: kullanıcı deneyecek mi, yoksa bir sorun mu var? Sorun varsa ve düzeltilecekse `status: review` → `in-progress` yap, bulguyu tarihli yorum olarak ekle. `blocked` ise engelin kalkıp kalkmadığını sor, kendin değiştirme. Kapalıysa söyle ve dur.
-- "Önce şuna bir bakalım" gibi keşif için açılan işi çekme; geçiş, işe başlama kararının kaydıdır.
+- If `status` is not `todo`, don't touch it. If it is already `in-progress`, continue. If it is `review`, show the `⏳` items in the last closing comment and ask: will the user try it, or is there a problem? If there is a problem and it will be fixed, change `status: review` → `in-progress` and add the finding as a dated comment. If it is `blocked`, ask whether the blocker has been lifted; don't change it yourself. If it is closed, say so and stop.
+- Don't pull a task opened for exploration like "let's take a look at this first"; the transition is the record of the decision to start the work.
 
-Üstlenmek durumu `in-progress` yapmaktır. Dosyayı yazmadan hemen önce yeniden oku (başka bir oturum değiştirmiş olabilir), sonra:
+Claiming means setting the status to `in-progress`. Read the file again right before writing it (another session may have changed it), then:
 
 ```bash
-# Edit aracıyla `status: todo` → `status: in-progress`, sonra yazılanı geri oku:
-grep '^status:' docs/tasks/ÖNEK-N.md
+# With the Edit tool, `status: todo` → `status: in-progress`, then read back what was written:
+grep '^status:' docs/tasks/PREFIX-N.md
 ```
 
-- Gövdeye, `sprint` alanına ve başka alanlara dokunma.
-- Bu geçiş yapılmazsa `/is-kapat` hangi işin açık olduğunu bulamaz.
+- Don't touch the body, the `sprint` field or any other field.
+- If this transition isn't made, `/is-kapat` can't find which task is open.
 
-## Adım 5: Kaz ve anlat
+## Step 5: Dig and explain
 
-**İş bir öneridir, karar değil.** Gövdede yazan çözüm yönü bu çalışmada kullanıcıyla birlikte değişebilir, reddedilebilir ya da olduğu gibi uygulanabilir.
+**The task is a proposal, not a decision.** The solution direction written in the body can change, be rejected or be implemented as is, together with the user in this session.
 
-Kodu ve ilgili alanın `git log`'unu oku, kök `CLAUDE.md`'ye (varsa alt klasörün kendi `CLAUDE.md`'sine) ve `docs/knowledge/`'taki ilgili sayfaya bak. Sonra, **herhangi bir şey sormadan önce**, kısa bir özet ver (`/is-ac` > Soru sormak): durum, bulduğun, ne yapmayı düşündüğün, açık sorular. Açık soru yoksa bunu söyle ve sorma.
+Read the code and the `git log` of the relevant area, and look at the root `CLAUDE.md` (and the subfolder's own `CLAUDE.md`, if there is one) and the relevant page in `docs/knowledge/`. Then, **before asking anything**, give a short summary (`/is-ac` > Asking questions): the situation, what you found, what you plan to do, the open questions. If there is no open question, say so and don't ask.
 
-- **Tasarım yorumu varsa** (`**Tasarım — <tarih>**`, `/is-ac` > Adım 5) o, kullanıcının cevaplarıyla birlikte üzerinde anlaşılmış tasarımdır; aynı soruları tekrar sorma. Ama o günün koduna göre yazılmıştır: kod hâlâ uyuyorsa geçerlidir, uymayan noktayı söyle ve yalnız onu yeniden aç. Tek eskimiş paragraf yüzünden bütün tasarımı atma, sessizce de izleme.
-- **Kabul yoksa ya da gözlenebilir değilse** işe başlamadan önce kullanıcıyla yaz; `/is-kapat` kanıtı ona göre ister.
+- **If there is a design comment** (`**Design — <date>**`, `/is-ac` > Step 5), it is the design agreed on, together with the user's answers; don't ask the same questions again. But it was written against that day's code: if the code still matches, it holds; name the point that doesn't match and reopen only that. Don't throw away the whole design over one stale paragraph, and don't follow it silently either.
+- **If there is no Kabul or it isn't observable**, write it with the user before starting; `/is-kapat` asks for evidence against it.
 
-Çalışma araç yüzünden yürümezse (build kırık, DB'ye erişim yok) bir kez dene; yine olmazsa üstlendiğin işi bulduğun hale geri al (`status: todo`), nedeni söyle ve dur. Ölü bir çalışmanın arkasında kalan `in-progress` iki tarafa da görünmez.
+If the work can't proceed because of tooling (broken build, no access to the DB), try once; if it still fails, put the task you claimed back as you found it (`status: todo`), say why and stop. An `in-progress` left behind a dead session is invisible to both sides.
 
-## Kurallar
+## Rules
 
-- İş açmak ve kapatmak bu skill'in işi değil: açma `/is-ac`, kapatma `/is-kapat`.
+- Opening and closing tasks is not this skill's job: opening is `/is-ac`, closing is `/is-kapat`.

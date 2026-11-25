@@ -1,5 +1,5 @@
 {
   "name": "sutlac",
-  "version": "0.1.1",
-  "description": "Repodaki docs/ klasöründe iş takibi: iş açma, başlatma, paralel oturumlara dağıtma, toplama ve kapatma skill'leri."
+  "version": "0.1.2",
+  "description": "Issue tracking in your repo's docs/ folder: local UI, CLI and Claude Code skills to open, start, hand out, collect and close tasks."
 }

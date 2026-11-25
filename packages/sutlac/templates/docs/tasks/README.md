@@ -1,74 +1,74 @@
 # Tasks
 
-Her iş bu klasörde tek bir md dosyasıdır: `{{PREFIX}}-1.md`, `{{PREFIX}}-2.md`... Klasör küçük bir veritabanı gibi kullanılır; işin hangi alanı ilgilendirdiği `tags` alanına etiket olarak yazılır (etiketsiz kalabilir: `tags: []`), durum `status` alanındadır, sprinti `sprint` alanındadır. Alt klasör yoktur; biten ya da arşivlenen iş de yerinde kalır, böylece `{{PREFIX}}-N` linkleri kırılmaz. Bu klasörde iş dışında dosya durmaz (dokümanlar `knowledge/`, `decisions/`).
+Each task is a single md file in this folder: `{{PREFIX}}-1.md`, `{{PREFIX}}-2.md`... The folder is used like a small database; which area a task concerns is written as a tag in the `tags` field (it can stay untagged: `tags: []`), the status is in the `status` field, its sprint is in the `sprint` field. There are no subfolders; a finished or archived task stays in place too, so `{{PREFIX}}-N` links don't break. No file other than tasks sits in this folder (docs go in `knowledge/`, `decisions/`).
 
-## Yeni iş
+## New task
 
-Numara tek sıradır, etikete göre ayrılmaz. Sıradaki numara:
+Numbering is a single sequence, not split by tag. The next number:
 
 ```bash
 bunx sutlac next
 ```
 
-Kod, commit ve PR'da iş `{{PREFIX}}-12` diye anılır.
+In code, commits and PRs a task is referred to as `{{PREFIX}}-12`.
 
-## Şablon
+## Template
 
 ```md
 ---
 id: {{PREFIX}}-12
-title: Davranışı anlatan bir cümle
+title: A sentence that describes the behaviour
 status: todo          # {{DOCS}}/config.json > statuses
 tags: []              # {{DOCS}}/config.json > tags
 priority: normal      # {{DOCS}}/config.json > priorities
-sprint: 3             # boş: backlog (bkz. {{DOCS}}/sprints/README.md)
+sprint: 3             # empty: backlog (see {{DOCS}}/sprints/README.md)
 created: 2026-01-15
 closed:
 ---
 
 ## Bağlam
-Neden gerekli, kim istedi. Hatada yeniden üretme adımları.
+Why it is needed, who asked for it. For a bug, the reproduction steps.
 
 ## Kabul
-1. Kodu okumadan doğru/yanlış denebilecek bir davranış iddiası.
+1. A behaviour claim that can be called true/false without reading the code.
 
 ## Yapılacaklar
 - [ ] ...
 
 ## Notlar
-- 2026-01-15: Ne değişti / neden ilgilendirir / ne yapmalı.
+- 2026-01-15: What changed / why it matters / what to do.
 ```
 
-Geçerli değerler (etiketler, durumlar, öncelikler) ve işlere eklenebilen özel alanlar `{{DOCS}}/config.json`'dadır; arayüzde Ayarlar'dan da düzenlenir. Kapalı sayılan durumlar (`closed: true`) kapanış tarihi ister. Özel alan frontmatter'a `anahtar: değer` olarak eklenir.
+Valid values (tags, statuses, priorities) and the custom fields that can be added to tasks are in `{{DOCS}}/config.json`; they can also be edited in the UI under Settings. Statuses that count as closed (`closed: true`) require a closing date. A custom field is added to the frontmatter as `key: value`.
 
-## Yorumlar
+## Comments
 
-Yorumlar dosyanın en sonundaki `## Yorumlar` bölümündedir; her yorum `### tarih saat` başlığıyla başlar (yazan tutulmaz). Arayüz bu bölümü editörden ayrı gösterir, elle de eklenebilir:
+Comments are in the `## Yorumlar` (comments) section at the very end of the file; each comment starts with a `### date time` heading (no author is kept). The UI shows this section separately from the editor; it can also be added by hand:
 
 ```md
 ## Yorumlar
 
 ### 2026-01-15 21:30
 
-Yorum metni (markdown). İçinde `## ` başlığı ve `### <tarih saat>` biçiminde satır kullanılmaz.
+Comment text (markdown). It uses no `## ` heading and no line of the form `### <date time>`.
 ```
 
-`## Notlar` başka alanlara haber içindir (aşağıdaki kural); yorum serbest konuşmadır.
+`## Notlar` (notes) is for notices to other areas (the rule below); a comment is free conversation.
 
-## Sorgular
+## Queries
 
 ```bash
-bunx sutlac list                                                  # açık işler: task|status|priority|tags|sprint|title|comments|last comment
-bunx sutlac list --tag api                                        # bir etiketin açık işleri
-grep -l '^status: review' {{DOCS}}/tasks/{{PREFIX}}-*.md          # denenmeyi bekleyenler
-grep -H '^title:' {{DOCS}}/tasks/{{PREFIX}}-*.md                  # başlık listesi
-grep -l '^sprint: 3$' {{DOCS}}/tasks/{{PREFIX}}-*.md              # Sprint 3'teki işler
+bunx sutlac list                                                  # open tasks: task|status|priority|tags|sprint|title|comments|last comment
+bunx sutlac list --tag api                                        # a tag's open tasks
+grep -l '^status: review' {{DOCS}}/tasks/{{PREFIX}}-*.md          # waiting to be tried
+grep -H '^title:' {{DOCS}}/tasks/{{PREFIX}}-*.md                  # title list
+grep -l '^sprint: 3$' {{DOCS}}/tasks/{{PREFIX}}-*.md              # tasks in Sprint 3
 ```
 
-## Kurallar
+## Rules
 
-- İş açmadan önce mevcut işlerde aranır; eşleşme varsa yeni iş açılmaz, kanıt oraya eklenir. Bağlam ve Kabul davranışı ürün diliyle anlatır; dosya yolu ve sembol adı eskir, `## Notlar`'da ya da yorumda durur. Ayrıntı: `/is-ac`.
-- `## Kabul` numaralı listedir (kutucuk değil); kapanışta her madde kanıtla işaretlenir (`/is-kapat`).
-- Başka bir alanı (uygulamayı, paketi) etkileyen bir not üç soruyu cevaplar: **ne değişti**, **neden ilgilendirir**, **ne yapmak gerekiyor**. "İlgilendirmiyor" geçerli bir cevaptır; nota yazılıp geçilir.
-- Durum akışı: `todo` → `in-progress` → `review` → `done`. `review`: kod bitti, commit'lendi, kontroller yeşil; Kabul'ün gerçek ortamda denenmesi ya da kullanıcı onayı bekleniyor. Kullanıcı deneyince board'da `done`'a sürükler; sorun çıkarsa iş `in-progress`'e döner. Kuralı `/is-kapat` uygular.
-- İş bitince `status: done` ve `closed` tarihi yazılır (arayüz kapanış tarihini kendisi yazar). Kalıcı bilgi `{{DOCS}}/knowledge/`'a, alınan karar `{{DOCS}}/decisions/`'a gider.
+- Before opening a task, existing tasks are searched; if there is a match, no new task is opened and the evidence is added there. `## Bağlam` (context) and `## Kabul` (acceptance criteria) describe the behaviour in product language; file paths and symbol names go stale and stay in `## Notlar` or in a comment. Details: `/is-ac`.
+- The Kabul section is a numbered list (not checkboxes); at closing each item is marked with evidence (`/is-kapat`).
+- A note that affects another area (app, package) answers three questions: **what changed**, **why it matters**, **what needs to be done**. "Not affected" is a valid answer; it is written in the note and that is that.
+- Status flow: `todo` → `in-progress` → `review` → `done`. `review`: the code is finished and committed, the checks are green; Kabul still has to be tried in the real environment or is waiting for the user's approval. Once the user has tried it they drag it to `done` on the board; if a problem turns up, the task goes back to `in-progress`. `/is-kapat` applies the rule.
+- When a task is finished, `status: done` and the `closed` date are written (the UI writes the closing date itself). Lasting knowledge goes to `{{DOCS}}/knowledge/`, a decision made goes to `{{DOCS}}/decisions/`.
