@@ -24,6 +24,6 @@ The skills (`task-open`, `task-start`, `task-dispatch`, `task-work`, `task-colle
 /plugin install sutlac@sutlac
 ```
 
-Section headings inside task files (`## Bağlam` context, `## Kabul` acceptance criteria, `## Yorumlar` comments) are part of the file format and are Turkish.
+Files written before 0.3 with Turkish section headings (`## Yorumlar`, `## Devredilenler`, `- **Durum:**` …) are still read, and an existing `## Yorumlar` heading is kept when comments are added.
 
 More: https://sutlac.omergenc.net · https://github.com/omer-genc/sutlac

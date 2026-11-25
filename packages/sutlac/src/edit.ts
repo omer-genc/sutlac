@@ -47,7 +47,7 @@ export function withClosed(
 }
 
 /** İş şablonundaki gövde (docs/tasks/README.md > Şablon); açıklama yazılmadıysa kullanılır. */
-export const TASK_TEMPLATE_BODY = "## Bağlam\n\n\n## Kabul\n1.\n\n## Yapılacaklar\n- [ ]\n\n## Notlar\n";
+export const TASK_TEMPLATE_BODY = "## Context\n\n\n## Acceptance\n1.\n\n## To-do\n- [ ]\n\n## Notes\n";
 
 export function newTaskSource(
   prefix: string,
@@ -90,7 +90,7 @@ end: ${end}
 closed:
 ---
 
-## Hedef
+## Goal
 
 `;
 }
@@ -101,14 +101,14 @@ export function newDocSource(title: string, decisionNum: number | null): string 
   if (decisionNum == null) return `# ${t}\n\n`;
   return `# ${String(decisionNum).padStart(4, "0")} · ${t}
 
-- **Tarih:** ${today()}
-- **Durum:** öneri
+- **Date:** ${today()}
+- **Status:** proposed
 
-## Bağlam
+## Context
 
-## Karar
+## Decision
 
-## Sonuçlar
+## Consequences
 `;
 }
 

@@ -4,9 +4,10 @@
  *   head      frontmatter; frontmatter'da başlık yoksa ilk `# Başlık` satırı ve
  *             (karar/bilgi sayfalarında) hemen altındaki `- **Alan:** değer` bloğu
  *   body      editörde düzenlenen markdown
- *   comments  dosyanın sonundaki `## Yorumlar` bölümü:
+ *   comments  dosyanın sonundaki `## Comments` bölümü (eski dosyalarda `## Yorumlar`; ikisi de okunur,
+ *             var olan başlık yazarken korunur):
  *
- *               ## Yorumlar
+ *               ## Comments
  *
  *               ### 2026-10-24 21:30
  *
@@ -25,9 +26,14 @@ export type Parts = {
   lead: string;
   body: string;
   comments: Comment[];
+  /** Dosyadaki yorum başlığı (`## Comments` ya da eski `## Yorumlar`); yoksa yenisi yazılır */
+  commentsHeading?: string;
 };
 
-export const COMMENTS_HEADING = "## Yorumlar";
+/** Yeni dosyalara yazılan başlık. */
+export const COMMENTS_HEADING = "## Comments";
+/** Okunan başlıklar: İngilizce ve 0.2 öncesinin Türkçesi. */
+const COMMENTS_RE = /^## (?:Comments|Yorumlar)\s*$/;
 /** Yorum başlığı: `### 2026-10-24 21:30`; saat eski kayıtlarda olmayabilir. */
 const COMMENT_RE = /^### (\d{4}-\d{2}-\d{2}(?: \d{2}:\d{2})?)$/gm;
 const H1_RE = /^(\s*)# (\d{4}\s*·\s*)?(.*)$/m;
@@ -58,26 +64,28 @@ export function splitDoc(src: string, opts: { leadBlock: boolean }): Parts {
   const top = text.slice(0, i);
   let rest = text.slice(i);
   let comments: Comment[] = [];
-  const at = commentsStart(rest);
-  if (at >= 0) {
-    comments = parseComments(rest.slice(at + COMMENTS_HEADING.length));
-    rest = rest.slice(0, at);
+  let commentsHeading: string | undefined;
+  const found = commentsStart(rest);
+  if (found) {
+    commentsHeading = found.heading;
+    comments = parseComments(rest.slice(found.at + found.heading.length));
+    rest = rest.slice(0, found.at);
   }
-  return { top, h1, lead, body: rest.trim(), comments };
+  return { top, h1, lead, body: rest.trim(), comments, commentsHeading };
 }
 
 /**
  * Yorum bölümünün başladığı karakter: kod bloğu dışında kalan ve dosyanın son `## ` bölümü
- * olan `## Yorumlar` satırı. Metinde (ör. kod örneğinde) geçen başlık yorum sayılmaz.
+ * olan `## Comments` (ya da `## Yorumlar`) satırı. Metinde (ör. kod örneğinde) geçen başlık yorum sayılmaz.
  */
-function commentsStart(text: string): number {
+function commentsStart(text: string): { at: number; heading: string } | null {
   let fence: string | null = null;
   let offset = 0;
-  let found = -1;
+  let found: { at: number; heading: string } | null = null;
   for (const line of text.split("\n")) {
     const f = line.match(/^\s*(```+|~~~+)/)?.[1];
     if (f && (!fence || f.startsWith(fence))) fence = fence ? null : f;
-    else if (!fence && /^## /.test(line)) found = new RegExp(`^${COMMENTS_HEADING}\\s*$`).test(line) ? offset : -1;
+    else if (!fence && /^## /.test(line)) found = COMMENTS_RE.test(line) ? { at: offset, heading: line.trimEnd() } : null;
     offset += line.length + 1;
   }
   return found;
@@ -105,7 +113,7 @@ export function joinDoc(p: Parts): string {
   if (p.comments.length) {
     out +=
       (out ? "\n" : "") +
-      `${COMMENTS_HEADING}\n\n` +
+      `${p.commentsHeading ?? COMMENTS_HEADING}\n\n` +
       p.comments.map((c) => `### ${c.at}\n\n${c.body.trim()}\n`).join("\n");
   }
   return out;

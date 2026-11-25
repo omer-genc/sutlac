@@ -83,3 +83,23 @@ test("kod bloğundaki ya da son bölüm olmayan `## Yorumlar` yorum sayılmaz", 
 test("safeCommentBody bölüm başlıklarını küçültür", () => {
   expect(safeCommentBody("## Başlık\n### 2026-01-01 10:00\n### Alt başlık\nmetin")).toBe("### Başlık\n#### 2026-01-01 10:00\n### Alt başlık\nmetin");
 });
+
+describe("yorum başlığı: İngilizce yazılır, Türkçe de okunur", () => {
+  const en = "---\nid: KES-2\ntitle: T\n---\n\n## Context\nText.\n\n## Comments\n\n### 2026-10-24 21:30\n\nFirst\n";
+  test("`## Comments` yorum bölümüdür", () => {
+    const p = splitDoc(en, { leadBlock: false });
+    expect(p.body).toBe("## Context\nText.");
+    expect(p.comments).toEqual([{ at: "2026-10-24 21:30", body: "First" }]);
+    expect(joinDoc(p)).toBe(en);
+  });
+  test("yorumu olmayan dosyaya ilk yorum `## Comments` ile eklenir", () => {
+    const p = splitDoc("---\nid: KES-3\ntitle: T\n---\n\n## Context\nText.\n", { leadBlock: false });
+    expect(joinDoc({ ...p, comments: [{ at: "2026-10-26 10:00", body: "Hi" }] })).toContain("\n## Comments\n\n### 2026-10-26 10:00\n\nHi\n");
+  });
+  test("eski dosyadaki `## Yorumlar` başlığı yorum eklenince korunur", () => {
+    const p = splitDoc(task, { leadBlock: false });
+    const out = joinDoc({ ...p, comments: [...p.comments, { at: "2026-10-26 10:00", body: "Üç" }] });
+    expect(out).toContain("## Yorumlar");
+    expect(out).not.toContain("## Comments");
+  });
+});

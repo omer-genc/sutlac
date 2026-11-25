@@ -258,7 +258,7 @@ function serve(port: number) {
             return rewrite(sprint.path, (src) => {
               const parts = splitDoc(setFields(src, { closed: nowStamp().slice(0, 10) }), { leadBlock: false });
               const list = open.map((t) => `- ${cfg.prefix}-${t.num} ${t.title}`).join("\n");
-              const body = open.length ? `${parts.body.trim()}\n\n## Devredilenler\n\n${list}`.trim() : parts.body;
+              const body = open.length ? `${parts.body.trim()}\n\n## Carried over\n\n${list}`.trim() : parts.body;
               return joinDoc({ ...parts, body });
             });
           }),

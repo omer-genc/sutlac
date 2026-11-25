@@ -62,14 +62,14 @@ If it is red, do not close: say what broke; if the fix is small do it here, othe
 
 ## Step 5: Close the task
 
-Apply the steps of `/task-close PREFIX-N`; use the items in the report as evidence for `## Kabul` (acceptance criteria), but re-verify the ✓ items where needed (does the test name exist, does the command really pass). The ⏳ items in the report:
+Apply the steps of `/task-close PREFIX-N`; use the items in the report as evidence for `## Acceptance`, but re-verify the ✓ items where needed (does the test name exist, does the command really pass). The ⏳ items in the report:
 
 - Those that can only be tried in the main session (device, simulator, single-copy resource) can be tried now (ask the user), or the task is moved to `review`.
 - "Questions asked" goes into the closing comment.
 
 ## Step 6: Findings and doc suggestions
 
-- For each finding in the report apply `/task-open`: search first (if there is a match, write to that task), then show the user the title, tags and Kabul and open it with approval. The findings can be listed in one message and opened with a single approval.
+- For each finding in the report apply `/task-open`: search first (if there is a match, write to that task), then show the user the title, tags and Acceptance and open it with approval. The findings can be listed in one message and opened with a single approval.
 - Doc suggestions: as in `/task-close` Step 5; suggest, get approval, write.
 - If "Impact on other areas" is filled in, `/task-close` Step 3.
 

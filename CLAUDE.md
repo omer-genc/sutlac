@@ -15,7 +15,7 @@ bun run build     # packages/sutlac/dist ve apps/site/dist
 - `skills/`, `hooks/` ve `templates/` hem npm paketiyle hem eklentiyle dağıtılır ve **başka repolarda** çalışır: içlerine bu repoya ya da belli bir projeye özgü yol, komut, ürün adı yazılmaz. Proje bilgisi hedef reponun `CLAUDE.md`'sinden okunur. Skill'lerde iş numarası `PREFIX-N` diye geçer.
 - Şablonlarda `{{PREFIX}}` ve `{{DOCS}}` `sutlac init` sırasında doldurulur.
 - `src/body.test.ts` ve `src/components/markdown/markdown.test.ts` bu reponun `docs/` klasöründeki her dosyayı editörden geçirir; `docs/`'a eklenen belge o testlerin girdisidir.
-- Dil: arayüz, CLI çıktısı, skill'ler, hook mesajları, şablonlar, README'ler ve site İngilizce. Kod yorumları ve test adları Türkçe. `.md` dosya biçimi başlıkları (`## Bağlam`, `## Kabul`, `## Yapılacaklar`, `## Notlar`, `## Yorumlar`, `## Devredilenler`, `## Hedef`) Türkçe kalır: arayüz bunları ayrıştırır ve mevcut repolar kullanır; skill ve şablonlar onlara birebir bu adlarla atıf yapar.
+- Dil: arayüz, CLI çıktısı, skill'ler, hook mesajları, şablonlar, README'ler ve site İngilizce. Kod yorumları ve test adları Türkçe. `.md` dosya biçimi başlıkları da İngilizce yazılır (`## Context`, `## Acceptance`, `## To-do`, `## Notes`, `## Comments`, `## Carried over`, `## Goal`); 0.3 öncesinin Türkçe başlıkları (`## Yorumlar`, `## Devredilenler`, `**Durum:**`, `**Tarih:**`, `**Kaynak:**`) okunmaya devam eder ve var olan `## Yorumlar` başlığı yorum eklenince korunur (`src/body.ts`, `src/docs.ts`).
 
 ## İşler
 

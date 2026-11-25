@@ -27,7 +27,7 @@ Every `.md` outside `tasks/` and `sprints/` is a doc; creating a new folder adds
 | Docs | Folder tree on the left, page on the right |
 | Settings | `config.json` editor |
 
-Task and doc text is edited in the editor; on save, unchanged paragraphs, lists and tables stay as they are in the file, and only the edited block is rewritten. The "Source" button opens the whole file as plain text. Comments are written to the `## Yorumlar` (comments) section at the end of the file (format: `tasks/README.md`).
+Task and doc text is edited in the editor; on save, unchanged paragraphs, lists and tables stay as they are in the file, and only the edited block is rewritten. The "Source" button opens the whole file as plain text. Comments are written to the `## Comments` section at the end of the file (format: `tasks/README.md`).
 
 ## Command line
 

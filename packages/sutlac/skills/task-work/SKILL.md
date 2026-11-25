@@ -21,7 +21,7 @@ If the project has a worktree setup (`scripts/worktree-setup.sh`; a hook runs it
 
 ## Step 1: Read the task
 
-Read the task file **from the main checkout**: `<main checkout>/docs/tasks/PREFIX-N.md` (the copy in the worktree is at the commit from before the hand-out; the status and the latest comments are in the main checkout). From start to finish: `## Bağlam` (context), `## Kabul` (acceptance criteria), `## Yapılacaklar` (to-dos), `## Notlar` (notes), `## Yorumlar` (comments); if there is a design comment, that is the agreed design. The "Scope" and "Don't touch" lines in the brief are the boundary.
+Read the task file **from the main checkout**: `<main checkout>/docs/tasks/PREFIX-N.md` (the copy in the worktree is at the commit from before the hand-out; the status and the latest comments are in the main checkout). From start to finish: `## Context`, `## Acceptance`, `## To-do`, `## Notes`, `## Comments`; if there is a design comment, that is the agreed design. The "Scope" and "Don't touch" lines in the brief are the boundary.
 
 Read the root `CLAUDE.md` and, if the subfolder you will change has its own `CLAUDE.md`, that one too.
 
@@ -37,7 +37,7 @@ If the brief and the task file contradict each other, or a design decision is ne
 ## Step 3: Try and check
 
 - Dev server and preview only on this worktree's own ports; do not write to the main checkout's running server, database or files. The project's parallel-work rules (port, data copy, shared and remote resources, test accounts) are in the root `CLAUDE.md` or in `docs/knowledge/`; follow what is there, do not ask the user for passwords.
-- Do not use single-copy resources (device, simulator, shared remote service). A Kabul item that has to be seen there stays ⏳ in the report, with how to try it.
+- Do not use single-copy resources (device, simulator, shared remote service). A Acceptance item that has to be seen there stays ⏳ in the report, with how to try it.
 - Checks: the project's check command (root `CLAUDE.md`; e.g. `bun run check`). If it is red, fix it; if you cannot, write `Status: stuck` in the report.
 
 ## Step 4: Commit and report

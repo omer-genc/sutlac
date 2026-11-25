@@ -9,16 +9,16 @@ created: 2026-11-25
 closed:
 ---
 
-## Bağlam
+## Context
 Paket Keskin monoreposundaki `docs-viewer`'dan ayrıldı; başka repolarda `bunx sutlac` ile kullanılabilmesi için npm'de olması gerekiyor. `sutlac` adının npm'de boş olup olmadığına bakılmadı.
 
-## Kabul
+## Acceptance
 1. Boş bir klasörde `bunx sutlac init --prefix DNM` docs iskeletini kurar.
 2. Aynı klasörde `bunx sutlac` arayüzü açar; Board, Backlog ve Ayarlar yüklenir.
 3. `bunx sutlac skills` altı skill'i `.claude/skills/` altına kopyalar.
 
-## Yapılacaklar
+## To-do
 - [ ] npm'de ad kontrolü (doluysa scope: `@<kullanıcı>/sutlac`)
 - [ ] `bun publish` (prepublishOnly: typecheck + test + build)
 
-## Notlar
+## Notes

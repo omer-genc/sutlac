@@ -64,7 +64,7 @@ Then ask a single question: which one do we start with?
 
 ## Step 4: Claim the chosen task
 
-When the user picks a task (or says "let's start PREFIX-N" directly, without `/task-start`), read the file **from top to bottom**: `## Bağlam` (context), `## Kabul` (acceptance criteria), `## Yapılacaklar` (to-dos), `## Notlar` (notes) and `## Yorumlar` (comments). The comments matter as much as the body; a later comment that contradicts the body replaces the body. Also open the `PREFIX-N`s mentioned in Bağlam.
+When the user picks a task (or says "let's start PREFIX-N" directly, without `/task-start`), read the file **from top to bottom**: `## Context`, `## Acceptance`, `## To-do`, `## Notes` and `## Comments`. The comments matter as much as the body; a later comment that contradicts the body replaces the body. Also open the `PREFIX-N`s mentioned in Context.
 
 **Gates**, before writing:
 
@@ -88,7 +88,7 @@ grep '^status:' docs/tasks/PREFIX-N.md
 Read the code and the `git log` of the relevant area, and look at the root `CLAUDE.md` (and the subfolder's own `CLAUDE.md`, if there is one) and the relevant page in `docs/knowledge/`. Then, **before asking anything**, give a short summary (`/task-open` > Asking questions): the situation, what you found, what you plan to do, the open questions. If there is no open question, say so and don't ask.
 
 - **If there is a design comment** (`**Design — <date>**`, `/task-open` > Step 5), it is the design agreed on, together with the user's answers; don't ask the same questions again. But it was written against that day's code: if the code still matches, it holds; name the point that doesn't match and reopen only that. Don't throw away the whole design over one stale paragraph, and don't follow it silently either.
-- **If there is no Kabul or it isn't observable**, write it with the user before starting; `/task-close` asks for evidence against it.
+- **If there is no Acceptance or it isn't observable**, write it with the user before starting; `/task-close` asks for evidence against it.
 
 If the work can't proceed because of tooling (broken build, no access to the DB), try once; if it still fails, put the task you claimed back as you found it (`status: todo`), say why and stop. An `in-progress` left behind a dead session is invisible to both sides.
 

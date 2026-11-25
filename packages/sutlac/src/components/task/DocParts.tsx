@@ -338,6 +338,11 @@ export function TaskProps({
 /** Doküman başındaki `- **Alan:** değer` satırları (dosyada düzenlenir). */
 export function PageProps({ doc }: { doc: FullDoc }) {
   const ICON: Record<string, React.ReactNode> = {
+    Status: <CircleDashed className="size-4" />,
+    Date: <CalendarBlank className="size-4" />,
+    Source: <LinkIcon className="size-4" />,
+    Related: <LinkIcon className="size-4" />,
+    // 0.2 öncesi dosyalardaki Türkçe anahtarlar
     Durum: <CircleDashed className="size-4" />,
     Tarih: <CalendarBlank className="size-4" />,
     Kaynak: <LinkIcon className="size-4" />,

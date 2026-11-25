@@ -68,7 +68,7 @@ Upgrading from 0.1.x: the skills were renamed (`is-ac` → `task-open`, `is-basl
 
 The skills assume nothing project-specific; they read the check command, commit style and parallel-work rules from the target repo's root `CLAUDE.md`. If the target repo has a `scripts/worktree-setup.sh`, it runs at the start of every worktree session (copying env files, picking ports and similar setup belongs there). The target repo's `.gitignore` should contain `.worktree/`.
 
-> **Language.** Everything is in English except the section headings inside task files: `## Bağlam` (context), `## Kabul` (acceptance criteria), `## Yapılacaklar` (to-dos), `## Notlar` (notes), `## Yorumlar` (comments). The UI parses those headings, so they are part of the file format.
+> **Compatibility.** Files written before 0.3 with Turkish section headings (`## Yorumlar`, `## Devredilenler`, `- **Durum:**` …) are still read, and an existing `## Yorumlar` heading is kept when comments are added.
 
 ## Releasing
 

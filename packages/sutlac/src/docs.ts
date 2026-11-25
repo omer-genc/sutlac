@@ -159,7 +159,7 @@ export class DocStore {
     const title = str(fields.title) ?? str(fields.name) ?? parts.h1?.text ?? (kind === "sprint" ? `Sprint ${num}` : name);
     const done = (parts.body.match(/^\s*[-*] \[[xX]\]/gm) ?? []).length;
     const total = done + (parts.body.match(/^\s*[-*] \[ \]/gm) ?? []).length;
-    const carriedSection = parts.body.match(/^## Devredilenler\s*\n([\s\S]*?)(?=^## |(?![\s\S]))/m)?.[1] ?? "";
+    const carriedSection = parts.body.match(/^## (?:Carried over|Devredilenler)\s*\n([\s\S]*?)(?=^## |(?![\s\S]))/m)?.[1] ?? "";
 
     const flat: Record<string, string> = {};
     for (const [k, v] of Object.entries(fields)) flat[k] = Array.isArray(v) ? v.join(", ") : v;
@@ -172,13 +172,13 @@ export class DocStore {
       titleSource: fields.title != null ? "frontmatter" : parts.h1 ? "h1" : "none",
       num,
       ref: kind === "task" ? `${this.prefix}-${num}` : null,
-      status: str(fields.status) ?? bold["Durum"] ?? null,
+      status: str(fields.status) ?? bold["Status"] ?? bold["Durum"] ?? null,
       tags: Array.isArray(tags) ? tags : tags ? [tags] : [],
       priority: str(fields.priority),
       sprint: kind === "task" ? int(str(fields.sprint)) : null,
-      created: str(fields.created) ?? bold["Tarih"] ?? null,
+      created: str(fields.created) ?? bold["Date"] ?? bold["Tarih"] ?? null,
       closed: str(fields.closed),
-      source: str(fields.source) ?? bold["Kaynak"] ?? null,
+      source: str(fields.source) ?? bold["Source"] ?? bold["Kaynak"] ?? null,
       start: str(fields.start),
       end: str(fields.end),
       carried: [...carriedSection.matchAll(new RegExp(`\\b${this.prefix}-(\\d+)\\b`, "g"))].map((m) => Number(m[1])),

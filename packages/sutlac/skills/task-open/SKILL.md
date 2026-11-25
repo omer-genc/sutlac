@@ -25,8 +25,8 @@ grep -li '<mechanism: endpoint fragment, error code, field name>' docs/tasks/PRE
 
 Show the title and status of the hits in one go: `grep -H -e '^title:' -e '^status:' <files>`.
 
-- **Open match** → don't open a new task. Add the evidence to that task: if it is a notice for another area, a dated line in `## Notlar` (notes); otherwise a comment in `## Yorumlar` (comments). If it changes the scope, say so in that comment.
-- **Partial match** → write there first, make only the uncovered remainder a new task, and state in the first line of its `## Bağlam` (context) which task it was split from.
+- **Open match** → don't open a new task. Add the evidence to that task: if it is a notice for another area, a dated line in `## Notes`; otherwise a comment in `## Comments`. If it changes the scope, say so in that comment.
+- **Partial match** → write there first, make only the uncovered remainder a new task, and state in the first line of its `## Context` which task it was split from.
 - **Closed match** → this is a regression, not the same task. Open a new task and write `Regression: PREFIX-N` in the first line.
 
 Tell the user in one sentence which searches you ran and what came up. A search that isn't reported counts as not done.
@@ -36,7 +36,7 @@ Tell the user in one sentence which searches you ran and what came up. A search 
 Problems that can be fixed separately and verified independently of each other are separate tasks. Symptoms that come from a single root behaviour are one task. If undecided, pick the thin task: a thick task with two of its three criteria passing neither closes nor goes back.
 
 - If more than one area (app, package) carries the same change, it is one task with all the tags: `tags: [api, web]`. A separate task per area only if the work will really be done at separate times.
-- When splitting, open the blocker first and write `After: PREFIX-N` in the Bağlam of the one that follows. Use this line only for real ordering (B can't be tried before A is finished); to say "related", use `Related: PREFIX-N`.
+- When splitting, open the blocker first and write `After: PREFIX-N` in the Context of the one that follows. Use this line only for real ordering (B can't be tried before A is finished); to say "related", use `Related: PREFIX-N`.
 - Each piece is a separate task and needs the Step 1 search separately.
 
 **A second pair of eyes first on a big task.** If the task brings a new screen, table, app or sync, changes more than one area, or will take longer than a few days, have a sub-agent critique the proposal and what Step 1 found before you write it (if the project has an agent for critique or architecture under `.claude/agents/`, that one; otherwise a general sub-agent: "is this task needed, can it be made smaller, who will use it?"). Show its verdict (including "Shrink it" and "Drop it") to the user; the user decides. It is not called for a bug fix or a small task. If the solution has more than one serious option, the comparison goes into the design comment in Step 5.
@@ -46,23 +46,23 @@ Problems that can be fixed separately and verified independently of each other a
 The test: after a refactor renames every file the task touches, does the task still say something true?
 
 - **Write the behaviour, not the code.** "A branch user sees another branch's order in the order list", not "`buildOrderFilter` skips the scope". The second becomes wrong the moment the function is split, and ties the solution to one place.
-- **No file path, line number or symbol name in Bağlam and Kabul.** They are what goes stale fastest. An endpoint path (`GET /api/v1/orders`) and a field name are a contract and may be written.
+- **No file path, line number or symbol name in Context and Acceptance.** They are what goes stale fastest. An endpoint path (`GET /api/v1/orders`) and a field name are a contract and may be written.
 - **The product's own words:** the name the user and the team give that thing (order, branch, invoice...). Don't invent module names.
 - **For a bug, reproduction steps are mandatory:** numbered, concrete; which role, which account, which data. If you can't reproduce it, what you have is a suspicion, not a task; write it as a comment on a related task.
-- **Raw evidence** (stack trace, query output, failing test) sits in Bağlam inside a code block, with what produced it and at which commit written down. The text around it must make sense on its own even after the block goes stale.
+- **Raw evidence** (stack trace, query output, failing test) sits in Context inside a code block, with what produced it and at which commit written down. The text around it must make sense on its own even after the block goes stale.
 - **Readable in thirty seconds.** Something that needs a long explanation is usually something that needs splitting.
 
-### Kabul
+### Acceptance
 
-`## Kabul` (acceptance criteria) is the list of what will be proven when the task is closed. Each item is a claim that can be called true or false without reading the code; numbered, one per line:
+`## Acceptance` is the list of what will be proven when the task is closed. Each item is a claim that can be called true or false without reading the code; numbered, one per line:
 
 ```md
-## Kabul
+## Acceptance
 1. A branch user sees only their own branch's orders in the order list.
 2. The detail of an out-of-scope order returns 403.
 ```
 
-A criterion that can't be observed ("the code will be cleaner") can't be proven at closing; either make it observable or remove it. `## Yapılacaklar` (to-dos, `- [ ] api: ...`) is how the work is split up, Kabul is what will be true.
+A criterion that can't be observed ("the code will be cleaner") can't be proven at closing; either make it observable or remove it. `## To-do` (to-dos, `- [ ] api: ...`) is how the work is split up, Acceptance is what will be true.
 
 ### Fields
 
@@ -75,7 +75,7 @@ Number: `bunx sutlac next` (if the command is missing, `docs/tasks/README.md` > 
 
 ## Step 4: Approval and commit
 
-If the user didn't ask for the task themselves (a finding from ongoing work, a notice task), show the title, tags and Kabul before writing the file and get approval. Don't open a task without approval.
+If the user didn't ask for the task themselves (a finding from ongoing work, a notice task), show the title, tags and Acceptance before writing the file and get approval. Don't open a task without approval.
 
 After opening, state the number and the file path. Opening a task doesn't require a commit; if it is part of ongoing work it goes into the same commit as that work, otherwise into a `docs: open PREFIX-N` commit (show the message, get approval).
 
@@ -110,6 +110,6 @@ The same rule in this skill and in `/task-start`:
 ## Rules
 
 - No task without a search; no new task if there is a match.
-- Bağlam and Kabul describe behaviour; file paths stay in Notlar and in the design comment.
-- Kabul items are observable claims.
+- Context and Acceptance describe behaviour; file paths stay in Notes and in the design comment.
+- Acceptance items are observable claims.
 - A task opened for someone else is `todo` and has no sprint.

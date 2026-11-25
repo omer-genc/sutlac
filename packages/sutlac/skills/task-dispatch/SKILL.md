@@ -12,17 +12,17 @@ This skill runs in the **main checkout** (outside a worktree); if `.git` is a fi
 
 ## Step 1: Read the tasks
 
-For each `PREFIX-N`, read the file from start to finish: `## Bağlam` (context), `## Kabul` (acceptance criteria), `## Yapılacaklar` (to-dos), `## Notlar` (notes), `## Yorumlar` (comments). The gates are the same as `/task-start` Step 4:
+For each `PREFIX-N`, read the file from start to finish: `## Context`, `## Acceptance`, `## To-do`, `## Notes`, `## Comments`. The gates are the same as `/task-start` Step 4:
 
 - A task that is `todo` or already `in-progress` is handed out. A `review`, `blocked` or closed task is not; say why.
-- If there is no Kabul section, or it is not observable, do not hand the task out: the sub-session cannot know what to collect evidence against. Write it with the user first.
+- If there is no Acceptance section, or it is not observable, do not hand the task out: the sub-session cannot know what to collect evidence against. Write it with the user first.
 - A task that needs a design decision and has not been discussed with the user (two readings lead to different work) is discussed here, or a design comment is written; the sub-session can ask the user, but that question splits the user between two windows.
 
 In practice 2-3 tasks; if the project sets an upper limit (port slots, a shared resource), that applies.
 
 ## Step 2: Conflict check
 
-Estimate from the code where the tasks will touch (design comment, the Notlar section, grep). Show the user a table: task → app → likely files.
+Estimate from the code where the tasks will touch (design comment, the Notes section, grep). Show the user a table: task → app → likely files.
 
 Hot spots: if two tasks both touch one, queue one of them or tell the user the merge cost:
 
@@ -36,7 +36,7 @@ Hot spots: if two tasks both touch one, queue one of them or tell the user the m
 
 If the project's own hot spots and parallel-work rules (ports, database copy, single-copy resources) are written in the root `CLAUDE.md` or in `docs/knowledge/`, read them and add them to the table.
 
-Kabul items that cannot be tried in a sub-session (a single-copy device, a simulator, live data) stay ⏳ there and are tried in the main session after `/task-collect`. Tell the user this.
+Acceptance items that cannot be tried in a sub-session (a single-copy device, a simulator, live data) stay ⏳ there and are tried in the main session after `/task-collect`. Tell the user this.
 
 ## Step 3: Prepare the main checkout
 
@@ -62,7 +62,7 @@ For two or more sessions, first `mcp__ccd_session__mark_chapter` ("Parallel: PRE
 
 Main checkout: <absolute path of the main checkout>
 Task file: <main checkout>/docs/tasks/PREFIX-N.md (read it from there; the copy in the worktree may be stale)
-Scope: <one sentence; not a summary of Kabul, the boundary>
+Scope: <one sentence; not a summary of Acceptance, the boundary>
 Don't touch: <the areas of the other parallel tasks, from Step 2>
 Note: <any decision discussed in the main session that is not in the task file>
 ```
@@ -80,6 +80,6 @@ If a sub-session gets stuck (`Status: stuck`) or asks a question, answer that se
 ## Rules
 
 - Runs in the main checkout; task status and comments are written only here.
-- A task without Kabul is not handed out.
+- A task without Acceptance is not handed out.
 - Two tasks touching the same files are not handed out in parallel; if the user wants it knowingly, the merge cost is stated.
 - No push; the sub-sessions' branches are brought into main with `/task-collect`.

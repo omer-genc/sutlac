@@ -14,7 +14,7 @@ Closes a task and makes what was learned permanent. Format and rules: `docs/task
 
 If `$ARGUMENTS` contains a `PREFIX-N`, use it. Otherwise find the ones in progress and in review with `grep -l '^status: \(in-progress\|review\)' docs/tasks/PREFIX-*.md`: if there is exactly one, assume it and continue **while saying so**; if there is more than one, ask; if there is none, ask for a number.
 
-Read the file from top to bottom: `## Bağlam` (context), `## Kabul` (acceptance criteria), `## Yapılacaklar` (to-dos), `## Notlar` (notes) and, if present, `## Yorumlar` (comments). A later comment that contradicts the body (narrowing the scope, changing a criterion) replaces the body.
+Read the file from top to bottom: `## Context`, `## Acceptance`, `## To-do`, `## Notes` and, if present, `## Comments`. A later comment that contradicts the body (narrowing the scope, changing a criterion) replaces the body.
 
 ## Step 1: Verify what was done
 
@@ -33,10 +33,10 @@ If the checks don't pass, don't close the task; state the situation and stop.
 
 ## Step 2: Is anything blocking the close
 
-- **Kabul:** Show evidence for each item: the test that verifies it, command output, request/response or what was seen in the browser. "The code does this" is not evidence. An item that can't be proven is either proven, or changed together with the user, or the reason it couldn't be proven is written in the closing note (with the user's approval), or the task is moved to `review` (Step 4). No ticking without evidence. Try the items that have no evidence and can be tried locally now (run the app, send the request, look at the screen; if the project has a skill for this, use it) and write what you saw as evidence.
-- **Scope:** If the task changed more than one area or brought a new screen, table or flow, give the task file and the diff to a sub-agent (to the project's critique agent, if it has one): was Kabul really met, is there a piece left that nobody will use? Show the verdict to the user; if there is a "blocker" finding, don't close before the user decides. If the user accepts the finding and closes anyway, write that in the closing note.
-- **Yapılacaklar:** If there is an unticked checkbox, either satisfy it or remove it together with the user. Don't close with an unmet item.
-- **Yorumlar:** If there is an unanswered question in `## Yorumlar` (a question was asked, no answer below it), don't close. If you know the answer, write it as a comment; if you don't, ask the user. Don't answer it out of your own head and move on.
+- **Acceptance:** Show evidence for each item: the test that verifies it, command output, request/response or what was seen in the browser. "The code does this" is not evidence. An item that can't be proven is either proven, or changed together with the user, or the reason it couldn't be proven is written in the closing note (with the user's approval), or the task is moved to `review` (Step 4). No ticking without evidence. Try the items that have no evidence and can be tried locally now (run the app, send the request, look at the screen; if the project has a skill for this, use it) and write what you saw as evidence.
+- **Scope:** If the task changed more than one area or brought a new screen, table or flow, give the task file and the diff to a sub-agent (to the project's critique agent, if it has one): was Acceptance really met, is there a piece left that nobody will use? Show the verdict to the user; if there is a "blocker" finding, don't close before the user decides. If the user accepts the finding and closes anyway, write that in the closing note.
+- **To-do:** If there is an unticked checkbox, either satisfy it or remove it together with the user. Don't close with an unmet item.
+- **Comments:** If there is an unanswered question in `## Comments` (a question was asked, no answer below it), don't close. If you know the answer, write it as a comment; if you don't, ask the user. Don't answer it out of your own head and move on.
 
 ## Step 3: Other areas
 
@@ -59,27 +59,27 @@ This change affects mobile: src/hooks/use-order.ts:42 calls this endpoint.
 Shall we do the adaptation now, or should I open a separate task?
 ```
 
-If a separate task is wanted, open it by the rules of `/task-open` (search first; if there is a match, not a new task but a dated line in that task's `## Notlar`). What is specific to a notice task:
+If a separate task is wanted, open it by the rules of `/task-open` (search first; if there is a match, not a new task but a dated line in that task's `## Notes`). What is specific to a notice task:
 
 - `tags` is the target area; the source task goes in the first line: `Source: PREFIX-N`.
-- `## Bağlam` answers three questions: **what changed** (what was there before, what is there now; with the real endpoint and field names), **why it matters**, **what should be done**. The `file:line` grep found goes into `## Notlar` as a dated line, not into Bağlam; it can go stale.
-- `## Kabul` is the behaviour to be observed in the target area: "Order detail lists the line items with the new `items[]` shape".
+- `## Context` answers three questions: **what changed** (what was there before, what is there now; with the real endpoint and field names), **why it matters**, **what should be done**. The `file:line` grep found goes into `## Notes` as a dated line, not into Context; it can go stale.
+- `## Acceptance` is the behaviour to be observed in the target area: "Order detail lists the line items with the new `items[]` shape".
 
 If the change doesn't concern another area, say so in one sentence in the closing note.
 
 ## Step 4: Close the task or move it to review
 
-**What `review` means:** the code is finished and committed, the checks are green (Step 1); what is missing is trying one or more Kabul items in the real environment (in the app, on live data) or the user's approval. If the checks are red, or there is an unmet checkbox in Yapılacaklar or an unanswered question, the task doesn't go to `review` either; it stays in `in-progress`.
+**What `review` means:** the code is finished and committed, the checks are green (Step 1); what is missing is trying one or more Acceptance items in the real environment (in the app, on live data) or the user's approval. If the checks are red, or there is an unmet checkbox in To-do or an unanswered question, the task doesn't go to `review` either; it stays in `in-progress`.
 
-- If every Kabul item has evidence (or its unprovability was written in the note with the user's approval): `done`.
+- If every Acceptance item has evidence (or its unprovability was written in the note with the user's approval): `done`.
 - If an item can only be proven by trying it in the real environment and it hasn't been tried yet: `review`. Tell the user which item is left and why.
 
-1. Make the completed checkboxes in Yapılacaklar `- [x]`.
+1. Make the completed checkboxes in To-do `- [x]`.
 2. Frontmatter: for `done`, `status: done`, `closed: <date +%F>` (get the date from the command, don't make it up); for `review`, `status: review`, `closed` stays empty.
-3. Add the closing note **as a comment** to the `## Yorumlar` section at the very end of the file; if the section doesn't exist, create it. The body is the definition of the task, the comment is the record of what happened.
+3. Add the closing note **as a comment** to the `## Comments` section at the very end of the file; if the section doesn't exist, create it. The body is the definition of the task, the comment is the record of what happened.
 
 ```md
-## Yorumlar
+## Comments
 
 ### 2026-10-24 21:30
 
@@ -99,17 +99,17 @@ For a task moved to `review` the note has the same format; an item waiting to be
 
 - The comment heading is only the time: `date '+%F %H:%M'`. No author is kept.
 - The comment text uses no `## ` heading and no line of the form `### <date time>`; the UI splits comments on these headings.
-- `## Yorumlar` is always the last section. When adding a line to `## Notlar`, add it before that.
+- `## Comments` is always the last section. When adding a line to `## Notes`, add it before that.
 
-If the task is a notice task being closed because it doesn't concern the other area (its Bağlam has `Source: PREFIX-N` or `### Kaynak`), no code check is needed; the note becomes `**Outcome:** Not affected. <why, in one sentence>`.
+If the task is a notice task being closed because it doesn't concern the other area (its Context has `Source: PREFIX-N` or `### Source`), no code check is needed; the note becomes `**Outcome:** Not affected. <why, in one sentence>`.
 
-A task that is abandoned rather than closed becomes `cancelled`, not `done`; the reason is written in `## Notlar`.
+A task that is abandoned rather than closed becomes `cancelled`, not `done`; the reason is written in `## Notes`.
 
 ## Step 5: Decision and knowledge
 
 Go through them in order; if you know the answer, propose it and get it approved.
 
-- **Was a lasting decision made?** If the sentence "we did this that way because of this" can be formed, open `docs/decisions/NNNN-short-title.md` (next number: `ls docs/decisions | tail -1`). The format is the same as the existing decisions: `# NNNN · Title`, `- **Tarih:**` (date), `- **Durum:** kabul` (status: accepted), `- **İlgili:** PREFIX-N` (related), followed by `## Bağlam`, `## Karar` (decision), `## Sonuçlar` (consequences). A rule that concerns only a single subfolder, where that folder has its own `CLAUDE.md`, is written there.
+- **Was a lasting decision made?** If the sentence "we did this that way because of this" can be formed, open `docs/decisions/NNNN-short-title.md` (next number: `ls docs/decisions | tail -1`). The format is the same as the existing decisions: `# NNNN · Title`, `- **Date:**` (date), `- **Status:** accepted`, `- **Related:** PREFIX-N` (related), followed by `## Context`, `## Decision` (decision), `## Consequences` (consequences). A rule that concerns only a single subfolder, where that folder has its own `CLAUDE.md`, is written there.
 - **Has knowledge gone stale?** If the task touched a flow described by a page in `docs/knowledge/` or by `CLAUDE.md`, update that page. Don't rewrite it from scratch; change only the stale part. `bunx sutlac check` catches stale paths in the docs.
 
 ## Step 6: Commit and summary
@@ -121,7 +121,7 @@ The summary is three lines: whether the task closed (or what is waiting to be tr
 ## Rules
 
 - No close if the checks aren't green (except a notice task that doesn't concern the area).
-- No close if there is an unmet criterion, a Kabul item without evidence or an unanswered question. If the only thing left is an item waiting to be tried in the real environment, the task becomes `review`, not `done`.
+- No close if there is an unmet criterion, a Acceptance item without evidence or an unanswered question. If the only thing left is an item waiting to be tried in the real environment, the task becomes `review`, not `done`.
 - Don't open a task without approval and without a search (`/task-open`).
 - The closing note is a comment; it is not written in the body.
 - If decisions and knowledge aren't updated here, they are never updated; don't skip Step 5.
