@@ -62,14 +62,14 @@ function CommentItem({
                 }
               >
                 <DotsThree weight="bold" />
-                <span className="sr-only">Yorum menüsü</span>
+                <span className="sr-only">Comment menu</span>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onSelect={startEdit}>
-                  <PencilSimple /> Düzenle
+                  <PencilSimple /> Edit
                 </DropdownMenuItem>
                 <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => setConfirmDelete(true)}>
-                  <Trash /> Sil
+                  <Trash /> Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -90,10 +90,10 @@ function CommentItem({
         {editing && (
           <div className="mt-2 flex gap-2">
             <Button size="sm" onClick={save} disabled={!draft.trim()}>
-              Kaydet
+              Save
             </Button>
             <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>
-              Vazgeç
+              Cancel
             </Button>
           </div>
         )}
@@ -101,12 +101,12 @@ function CommentItem({
       <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Yorum silinsin mi?</AlertDialogTitle>
-            <AlertDialogDescription>Bu yorum dosyadan kaldırılacak.</AlertDialogDescription>
+            <AlertDialogTitle>Delete comment?</AlertDialogTitle>
+            <AlertDialogDescription>This comment will be removed from the file.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Vazgeç</AlertDialogCancel>
-            <AlertDialogAction onClick={onDelete}>Sil</AlertDialogAction>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={onDelete}>Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -143,7 +143,7 @@ export function CommentList({
     // Yorumlar ana sütunun akışında: kendi kaydırma bölgesi yok, sol sütun kayar.
     <div className="flex flex-col gap-4">
       <h3 className="text-xs font-medium text-muted-foreground">
-        Yorumlar{comments.length > 0 && ` (${comments.length})`}
+        Comments{comments.length > 0 && ` (${comments.length})`}
       </h3>
 
       {comments.length > 0 && (
@@ -169,7 +169,7 @@ export function CommentList({
           <MarkdownSection
             key={composerKey}
             value=""
-            placeholder="Yorum yaz…"
+            placeholder="Write a comment…"
             editorClassName={COMPOSER_CLASS}
             onChange={setDraft}
             onSave={() => {}}
@@ -178,7 +178,7 @@ export function CommentList({
           />
           <div className="mt-2 flex items-center justify-end gap-2">
             <Button size="sm" onClick={submit} disabled={!draft.trim() || add.isPending}>
-              <PaperPlaneTilt /> Gönder
+              <PaperPlaneTilt /> Send
             </Button>
           </div>
         </div>

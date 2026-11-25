@@ -44,10 +44,10 @@ export function Sidebar({
   const nav: { page: Page; label: string; icon: ReactNode }[] = [
     { page: "board", label: "Board", icon: <Kanban /> },
     { page: "backlog", label: "Backlog", icon: <Tray /> },
-    { page: "tasks", label: "Tüm işler", icon: <ListBullets /> },
-    { page: "sprints", label: "Sprintler", icon: <Flag /> },
-    { page: "archive", label: "Arşiv", icon: <Archive /> },
-    { page: "docs", label: "Dokümanlar", icon: <FileText /> },
+    { page: "tasks", label: "All tasks", icon: <ListBullets /> },
+    { page: "sprints", label: "Sprints", icon: <Flag /> },
+    { page: "archive", label: "Archive", icon: <Archive /> },
+    { page: "docs", label: "Docs", icon: <FileText /> },
   ];
   // Kapanmış sprintler: sprint sayfasına linkli sade liste (en yeni üstte).
   const closed = sprints.filter((s) => s.closed).sort((a, b) => (b.num ?? 0) - (a.num ?? 0));
@@ -63,7 +63,7 @@ export function Sidebar({
         </div>
         {closed.length > 0 && (
           <div className="flex flex-col gap-0.5 pt-2">
-            <div className="flex h-8 items-center px-2 text-xs font-medium text-sidebar-foreground/70">Geçmiş sprintler</div>
+            <div className="flex h-8 items-center px-2 text-xs font-medium text-sidebar-foreground/70">Past sprints</div>
             {closed.map((s) => (
               <Item key={s.path} active={page === "sprints" && openSprint === s.num} icon={<ListChecks />} label={sprintLabel(s)} onClick={() => onOpenSprint(s.num!)} />
             ))}
@@ -71,8 +71,8 @@ export function Sidebar({
         )}
       </div>
       <div className="flex flex-col gap-0.5 p-2">
-        <Item active={page === "settings"} icon={<Gear />} label="Ayarlar" onClick={() => onGo("settings")} />
-        <Item icon={theme === "dark" ? <Sun /> : <Moon />} label={theme === "dark" ? "Açık tema" : "Koyu tema"} onClick={toggle} />
+        <Item active={page === "settings"} icon={<Gear />} label="Settings" onClick={() => onGo("settings")} />
+        <Item icon={theme === "dark" ? <Sun /> : <Moon />} label={theme === "dark" ? "Light theme" : "Dark theme"} onClick={toggle} />
       </div>
     </aside>
   );

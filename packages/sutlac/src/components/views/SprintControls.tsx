@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { isOpen, sprintLabel } from "@/lib/display";
+import { plural } from "@/lib/utils";
 
 // inci-doc SprintHeader / StartSprintForm / FinishSprintButton karşılıkları. Sprint bir
 // dosyadır (`sprints/sprint-N.md`); başlatmak onu açar, bitirmek `closed` tarihini yazar.
@@ -26,15 +27,15 @@ const isoDay = (ms: number) => new Date(ms).toLocaleDateString("sv-SE");
 function remaining(end: string | null): string | null {
   if (!end) return null;
   const d = Math.round((new Date(`${end}T00:00:00`).getTime() - new Date(isoDay(Date.now()) + "T00:00:00").getTime()) / DAY);
-  if (d > 0) return `${d} gün kaldı`;
-  if (d === 0) return "bugün bitiyor";
-  return `${-d} gün geçti`;
+  if (d > 0) return `${d} ${plural(d, "day")} left`;
+  if (d === 0) return "ends today";
+  return `${-d} ${plural(-d, "day")} overdue`;
 }
 
 /** "Sprint 3 — ad · 4 gün kaldı · 5/12 iş" + Sprinti bitir. */
 export function SprintHeader({ sprint, tasks, cfg, onOpen }: { sprint: DocMeta; tasks: DocMeta[]; cfg: Config; onOpen: () => void }) {
   const done = tasks.filter((t) => !isOpen(cfg, t)).length;
-  const parts = [remaining(sprint.end), `${done}/${tasks.length} iş`].filter(Boolean);
+  const parts = [remaining(sprint.end), `${done}/${tasks.length} ${plural(tasks.length, "task")}`].filter(Boolean);
   return (
     <div className="flex items-center gap-3">
       <span className="text-sm text-muted-foreground">
@@ -55,18 +56,18 @@ function FinishSprintButton({ sprint, openCount, doneCount }: { sprint: DocMeta;
       <AlertDialogTrigger
         render={<Button size="sm" />}
       >
-        Sprinti bitir
+        Finish sprint
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{sprintLabel(sprint)} bitirilsin mi?</AlertDialogTitle>
+          <AlertDialogTitle>Finish {sprintLabel(sprint)}?</AlertDialogTitle>
           <AlertDialogDescription>
-            {doneCount} biten iş sprintte kalır ve arşive geçer. {openCount} bitmemiş iş backlog'a döner ve sprint dosyasına "Devredilenler" olarak yazılır.
+            {doneCount} completed {plural(doneCount, "task")} {doneCount === 1 ? "stays" : "stay"} in the sprint and {doneCount === 1 ? "moves" : "move"} to the archive. {openCount} unfinished {plural(openCount, "task")} {openCount === 1 ? "returns" : "return"} to the backlog and {openCount === 1 ? "is" : "are"} recorded in the sprint file as carried over.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Vazgeç</AlertDialogCancel>
-          <AlertDialogAction onClick={() => finish.mutate()}>Sprinti bitir</AlertDialogAction>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={() => finish.mutate()}>Finish sprint</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -81,9 +82,9 @@ export function StartSprintForm({ next }: { next: number }) {
   return (
     <div className="mx-auto flex max-w-md flex-col items-center gap-4 py-24 text-center">
       <div>
-        <h2 className="text-xl font-semibold">Aktif sprint yok</h2>
+        <h2 className="text-xl font-semibold">No active sprint</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Board yalnızca aktif sprintteki işleri gösterir. Yeni sprinti (Sprint {next}) başlatıp backlog'dan iş çekin.
+          The board only shows tasks in the active sprint. Start a new sprint (Sprint {next}) and pull in tasks from the backlog.
         </p>
       </div>
       <form
@@ -93,10 +94,10 @@ export function StartSprintForm({ next }: { next: number }) {
           start.mutate({ name: name.trim(), end: end ? isoDay(end.getTime()) : "" });
         }}
       >
-        <Input placeholder="Sprint adı (opsiyonel)" value={name} onChange={(e) => setName(e.target.value)} className="h-8" />
-        <DatePicker value={end} onChange={setEnd} placeholder="Hedef bitiş (opsiyonel)" />
+        <Input placeholder="Sprint name (optional)" value={name} onChange={(e) => setName(e.target.value)} className="h-8" />
+        <DatePicker value={end} onChange={setEnd} placeholder="Target end date (optional)" />
         <Button type="submit" disabled={start.isPending}>
-          Sprint başlat
+          Start sprint
         </Button>
       </form>
     </div>

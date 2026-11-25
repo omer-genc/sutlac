@@ -11,13 +11,13 @@ export function Meta({ d }: { d: DocMeta }) {
   return (
     <>
       {d.todos.total > 0 && (
-        <span className="flex items-center gap-1 text-[11px] text-muted-foreground tabular-nums" title="Yapılacaklar">
+        <span className="flex items-center gap-1 text-[11px] text-muted-foreground tabular-nums" title="To-dos">
           <ListChecks className="size-3.5" />
           {d.todos.done}/{d.todos.total}
         </span>
       )}
       {d.comments > 0 && (
-        <span className="flex items-center gap-1 text-[11px] text-muted-foreground tabular-nums" title="Yorumlar">
+        <span className="flex items-center gap-1 text-[11px] text-muted-foreground tabular-nums" title="Comments">
           <ChatCircle className="size-3.5" />
           {d.comments}
         </span>
@@ -49,7 +49,7 @@ export function groupTasks(cfg: Config, group: ViewState["group"] | "closed", li
   if (group === "none") return [{ key: "all", title: null, items: list }];
   if (group === "closed") {
     // Arşiv: kapanış ayına göre, en yeni üstte.
-    const month = (d: DocMeta) => (d.closed ?? "").slice(0, 7) || "Tarihsiz";
+    const month = (d: DocMeta) => (d.closed ?? "").slice(0, 7) || "No date";
     const keys = [...new Set(list.map(month))].sort().reverse();
     return keys.map((k) => ({ key: k, title: k, items: list.filter((d) => month(d) === k) }));
   }
@@ -60,7 +60,7 @@ export function groupTasks(cfg: Config, group: ViewState["group"] | "closed", li
       title: (
         <>
           <Dot color={tagOf(cfg, k).color} />
-          {k === "—" ? "Etiketsiz" : tagOf(cfg, k).label}
+          {k === "—" ? "Untagged" : tagOf(cfg, k).label}
         </>
       ),
       items: list.filter((d) => (d.tags.length ? d.tags.includes(k) : k === "—")),
@@ -77,7 +77,7 @@ export function groupTasks(cfg: Config, group: ViewState["group"] | "closed", li
     items: list.filter((d) => d.status === s.id),
   }));
   const other = list.filter((d) => !cfg.statuses.some((s) => s.id === d.status));
-  if (other.length) groups.push({ key: "_other", title: "Diğer", items: other });
+  if (other.length) groups.push({ key: "_other", title: "Other", items: other });
   return groups;
 }
 
@@ -86,7 +86,7 @@ export function ListView({
   groups,
   selected,
   onOpen,
-  empty = "Bu filtreyle iş yok.",
+  empty = "No tasks match these filters.",
 }: {
   cfg: Config;
   groups: Group[];

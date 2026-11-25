@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 // inci-doc DocsPage: solda doküman ağacı, sağda sayfa. Ağaç docs/ klasör yapısıdır
 // (tasks/ ve sprints/ hariç); yeni doküman bir klasöre dosya olarak eklenir.
 
-const FOLDER_LABELS: Record<string, string> = { decisions: "Kararlar", knowledge: "Bilgi" };
+const FOLDER_LABELS: Record<string, string> = { decisions: "Decisions", knowledge: "Knowledge" };
 const folderLabel = (f: string) => FOLDER_LABELS[f] ?? f.split("/").pop()!;
 
 type Folder = { path: string; docs: DocMeta[]; children: Folder[] };
@@ -31,8 +31,8 @@ function buildTree(docs: DocMeta[]): Folder {
   };
   for (const d of docs) get(d.path.split("/").slice(0, -1).join("/")).docs.push(d);
   const sort = (f: Folder) => {
-    f.docs.sort((a, b) => (a.num ?? 1e9) - (b.num ?? 1e9) || a.title.localeCompare(b.title, "tr"));
-    f.children.sort((a, b) => folderLabel(a.path).localeCompare(folderLabel(b.path), "tr"));
+    f.docs.sort((a, b) => (a.num ?? 1e9) - (b.num ?? 1e9) || a.title.localeCompare(b.title, "en"));
+    f.children.sort((a, b) => folderLabel(a.path).localeCompare(folderLabel(b.path), "en"));
     f.children.forEach(sort);
   };
   sort(root);
@@ -70,7 +70,7 @@ function TreeFolder({
           <button
             className="invisible rounded p-0.5 text-muted-foreground group-hover:visible hover:bg-muted-foreground/20"
             onClick={() => onCreate(folder.path)}
-            title="Bu klasöre doküman ekle"
+            title="Add a doc to this folder"
           >
             <Plus className="size-3.5" />
           </button>
@@ -132,12 +132,12 @@ export function DocsPage({
     <div className="flex h-full min-h-0">
       <div className="flex w-72 shrink-0 flex-col gap-2 border-r p-3">
         <div className="flex items-center justify-between px-1">
-          <span className="text-xs font-semibold text-muted-foreground">Dokümanlar</span>
-          <Button variant="ghost" size="icon-sm" onClick={() => setCreating("knowledge")} title="Yeni doküman">
+          <span className="text-xs font-semibold text-muted-foreground">Docs</span>
+          <Button variant="ghost" size="icon-sm" onClick={() => setCreating("knowledge")} title="New doc">
             <Plus />
           </Button>
         </div>
-        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Dokümanlarda ara" className="h-7" />
+        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search docs" className="h-7" />
         <div className="min-h-0 flex-1 overflow-y-auto">
           <TreeFolder
             folder={tree}
@@ -154,7 +154,7 @@ export function DocsPage({
         {current ? (
           <DocPage key={current} path={current} cfg={cfg} onOpenDoc={onOpenDoc} />
         ) : (
-          <div className="flex h-full items-center justify-center text-sm text-muted-foreground">Soldan bir doküman seç.</div>
+          <div className="flex h-full items-center justify-center text-sm text-muted-foreground">Select a doc on the left.</div>
         )}
       </div>
       {creating != null && (
@@ -212,9 +212,9 @@ function NewDocDialog({ folder, folders, onClose, onCreated }: { folder: string;
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Yeni doküman</DialogTitle>
+          <DialogTitle>New doc</DialogTitle>
         </DialogHeader>
-        <Input autoFocus value={title} onChange={(e) => setTitle(e.target.value)} onKeyDown={(e) => e.key === "Enter" && submit()} placeholder="Başlık" className="h-9 text-sm" />
+        <Input autoFocus value={title} onChange={(e) => setTitle(e.target.value)} onKeyDown={(e) => e.key === "Enter" && submit()} placeholder="Title" className="h-9 text-sm" />
         <div className="flex flex-wrap gap-1">
           {folders.map((f) => (
             <button
@@ -227,14 +227,14 @@ function NewDocDialog({ folder, folders, onClose, onCreated }: { folder: string;
           ))}
         </div>
         <p className="text-xs text-muted-foreground">
-          {target === "decisions" ? "Kararlar sıradaki numarayla ve karar şablonuyla açılır." : `docs/${target ? `${target}/` : ""} altında bir .md dosyası olarak açılır.`}
+          {target === "decisions" ? "Decisions are created with the next number and the decision template." : `Created as a .md file under docs/${target ? `${target}/` : ""}`}
         </p>
         <DialogFooter>
           <Button variant="ghost" onClick={onClose}>
-            Vazgeç
+            Cancel
           </Button>
           <Button onClick={submit} disabled={!title.trim() || create.isPending}>
-            Oluştur
+            Create
           </Button>
         </DialogFooter>
       </DialogContent>

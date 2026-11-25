@@ -18,12 +18,12 @@ import { IMAGE_DIR, IMAGE_MIME, IMAGE_NAME, IMAGE_TYPES, MAX_IMAGE_BYTES, imageI
 export function findRoot(given?: string, from = process.cwd()): string {
   if (given) {
     const dir = resolve(given);
-    if (!existsSync(dir)) throw new Error(`${dir} yok`);
+    if (!existsSync(dir)) throw new Error(`${dir} does not exist`);
     return dir;
   }
   for (let dir = from; ; dir = dirname(dir)) {
     if (existsSync(resolve(dir, "docs", "config.json"))) return resolve(dir, "docs");
-    if (dirname(dir) === dir) throw new Error("docs/config.json bulunamadı; `sutlac init` ile oluştur ya da --dir ile klasörü ver");
+    if (dirname(dir) === dir) throw new Error("docs/config.json not found; create it with `sutlac init` or pass the folder with --dir");
   }
 }
 
@@ -61,7 +61,7 @@ const assets = opts.assets ? resolve(opts.assets) : null;
 const page = (): Response =>
   assets && existsSync(resolve(assets, "index.html"))
     ? new Response(Bun.file(resolve(assets, "index.html")), { headers: { "cache-control": "no-store" } })
-    : new Response("Arayüz paketlenmemiş: paket klasöründe `bun run build`.", { status: 500 });
+    : new Response("The UI is not built: run `bun run build` in the package folder.", { status: 500 });
 
 const store = new DocStore(root, loadConfig(configFile).prefix);
 
@@ -81,7 +81,7 @@ watch(root, { recursive: true }, (_, name) => {
 });
 
 const json = (data: unknown, status = 200) => Response.json(data, { status, headers: { "cache-control": "no-store" } });
-const conflict = (what = "Dosya") => json({ error: `${what} bu arada başka yerde değişti; yeniden yükleyip tekrar dene.` }, 409);
+const conflict = (what = "The file") => json({ error: `${what} changed elsewhere in the meantime; reload and try again.` }, 409);
 const pathOf = (req: Request, prefix: string) => decodeURIComponent(new URL(req.url).pathname.slice(prefix.length));
 
 /** docs/ dışına çıkmayan, var olan bir .md dosyasının mutlak yolu. */
@@ -98,7 +98,7 @@ async function writeGuard(req: Request, fn: () => Promise<Response>): Promise<Re
   const origin = req.headers.get("origin");
   const host = req.headers.get("host");
   if (req.headers.get("x-sutlac") !== "1" || (origin && new URL(origin).host !== host)) {
-    return json({ error: "izin yok" }, 403);
+    return json({ error: "not allowed" }, 403);
   }
   try {
     return await fn();
@@ -110,7 +110,7 @@ async function writeGuard(req: Request, fn: () => Promise<Response>): Promise<Re
 /** Dosyayı okuyup `edit` ile dönüştürür ve yazar; güncel belgeyi döner. */
 async function rewrite(path: string, edit: (src: string) => string | Response): Promise<Response> {
   const file = fileOf(path);
-  if (!file) return json({ error: "bulunamadı" }, 404);
+  if (!file) return json({ error: "not found" }, 404);
   const out = edit(await Bun.file(file).text());
   if (out instanceof Response) return out;
   await Bun.write(file, out);
@@ -131,7 +131,7 @@ function serve(port: number) {
           try {
             return json(loadConfig(configFile));
           } catch (e) {
-            return json({ error: `config.json okunamadı: ${e instanceof Error ? e.message : e}` }, 500);
+            return json({ error: `could not read config.json: ${e instanceof Error ? e.message : e}` }, 500);
           }
         },
         PUT: (req) =>
@@ -145,7 +145,7 @@ function serve(port: number) {
       "/api/doc/*": {
         GET: async (req) => {
           const doc = store.get(pathOf(req, "/api/doc/"));
-          if (!doc) return json({ error: "bulunamadı" }, 404);
+          if (!doc) return json({ error: "not found" }, 404);
           const file = resolve(root, `${doc.path}.md`);
           return json({ ...doc, file, raw: await Bun.file(file).text() });
         },
@@ -155,7 +155,7 @@ function serve(port: number) {
             const p = (await req.json()) as DocPatch;
             const path = pathOf(req, "/api/doc/");
             const doc = store.get(path);
-            if (!doc) return json({ error: "bulunamadı" }, 404);
+            if (!doc) return json({ error: "not found" }, 404);
             const closed = new Set(loadConfig(configFile).statuses.filter((s) => s.closed).map((s) => s.id));
             const h1Title = p.title != null && doc.titleSource === "h1";
             return rewrite(path, (src) => {
@@ -166,7 +166,7 @@ function serve(port: number) {
               if (p.body != null || h1Title) {
                 let parts = splitDoc(out, { leadBlock: doc.kind === "doc" });
                 if (p.body != null) {
-                  if (p.baseBody != null && parts.body !== p.baseBody.trim()) return conflict("Metin");
+                  if (p.baseBody != null && parts.body !== p.baseBody.trim()) return conflict("The text");
                   parts = { ...parts, body: p.body };
                 }
                 if (h1Title) parts = withTitle(parts, p.title!);
@@ -181,7 +181,7 @@ function serve(port: number) {
             const { content, mtime } = (await req.json()) as { content: string; mtime: number };
             const path = pathOf(req, "/api/doc/");
             const file = fileOf(path);
-            if (!file) return json({ error: "bulunamadı" }, 404);
+            if (!file) return json({ error: "not found" }, 404);
             if (statSync(file).mtimeMs !== mtime) return conflict();
             await Bun.write(file, content);
             return json(store.get(path));
@@ -194,7 +194,7 @@ function serve(port: number) {
           writeGuard(req, async () => {
             const { body } = (await req.json()) as { body: string };
             const text = safeCommentBody(body ?? "");
-            if (!text) return json({ error: "Yorum boş" }, 422);
+            if (!text) return json({ error: "Comment is empty" }, 422);
             const path = pathOf(req, "/api/comments/");
             return rewrite(path, (src) => {
               const parts = splitDoc(src, { leadBlock: store.kindOf(path) === "doc" });
@@ -205,12 +205,12 @@ function serve(port: number) {
           writeGuard(req, async () => {
             const { index: i, at, body } = (await req.json()) as CommentRef & { body: string };
             const text = safeCommentBody(body ?? "");
-            if (!text) return json({ error: "Yorum boş" }, 422);
+            if (!text) return json({ error: "Comment is empty" }, 422);
             const path = pathOf(req, "/api/comments/");
             return rewrite(path, (src) => {
               const parts = splitDoc(src, { leadBlock: store.kindOf(path) === "doc" });
               const c = parts.comments[i];
-              if (!c || c.at !== at) return conflict("Yorumlar");
+              if (!c || c.at !== at) return conflict("The comments");
               return joinDoc({ ...parts, comments: parts.comments.with(i, { ...c, body: text }) });
             });
           }),
@@ -221,7 +221,7 @@ function serve(port: number) {
             return rewrite(path, (src) => {
               const parts = splitDoc(src, { leadBlock: store.kindOf(path) === "doc" });
               const c = parts.comments[i];
-              if (!c || c.at !== at) return conflict("Yorumlar");
+              if (!c || c.at !== at) return conflict("The comments");
               return joinDoc({ ...parts, comments: parts.comments.filter((_, j) => j !== i) });
             });
           }),
@@ -233,7 +233,7 @@ function serve(port: number) {
             const b = (await req.json()) as { name?: string; end?: string };
             const sprints = store.list().filter((d) => d.kind === "sprint");
             const active = sprints.find((s) => !s.closed);
-            if (active) return json({ error: `${active.title} hâlâ açık; önce onu bitir.` }, 422);
+            if (active) return json({ error: `${active.title} is still open; finish it first.` }, 422);
             const num = Math.max(0, ...sprints.map((s) => s.num ?? 0)) + 1;
             mkdirSync(resolve(root, "sprints"), { recursive: true });
             await Bun.write(resolve(root, "sprints", `sprint-${num}.md`), newSprintSource({ name: b.name ?? "", end: b.end }));
@@ -247,7 +247,7 @@ function serve(port: number) {
           writeGuard(req, async () => {
             const all = store.list();
             const sprint = all.find((d) => d.kind === "sprint" && !d.closed);
-            if (!sprint) return json({ error: "Aktif sprint yok" }, 422);
+            if (!sprint) return json({ error: "No active sprint" }, 422);
             const cfg = loadConfig(configFile);
             const closedIds = new Set(cfg.statuses.filter((s) => s.closed).map((s) => s.id));
             const open = all.filter((d) => d.kind === "task" && d.sprint === sprint.num && !closedIds.has(d.status ?? ""));
@@ -268,10 +268,10 @@ function serve(port: number) {
         POST: (req) =>
           writeGuard(req, async () => {
             const { folder = "", title = "" } = (await req.json()) as { folder?: string; title?: string };
-            if (!title.trim()) return json({ error: "Başlık gerekli" }, 422);
+            if (!title.trim()) return json({ error: "Title is required" }, 422);
             const dir = resolve(root, folder);
             if (!(dir === root || dir.startsWith(root + sep)) || !existsSync(dir) || ["tasks", "sprints"].includes(folder.split("/")[0]!)) {
-              return json({ error: "Geçersiz klasör" }, 422);
+              return json({ error: "Invalid folder" }, 422);
             }
             let num: number | null = null;
             if (folder === "decisions") {
@@ -299,7 +299,7 @@ function serve(port: number) {
               body?: string;
               fields?: Record<string, string>;
             };
-            if (!t.title?.trim()) return json({ error: "Başlık gerekli" }, 422);
+            if (!t.title?.trim()) return json({ error: "Title is required" }, 422);
             const cfg = loadConfig(configFile);
             mkdirSync(resolve(root, "tasks"), { recursive: true });
             const taskFile = new RegExp(`^${cfg.prefix}-(\\d+)\\.md$`);
@@ -331,12 +331,12 @@ function serve(port: number) {
           writeGuard(req, async () => {
             const type = (req.headers.get("content-type") ?? "").split(";")[0]!.trim().toLowerCase();
             const ext = IMAGE_TYPES[type];
-            if (!ext) return json({ error: "Yalnız PNG, JPEG, WebP ve GIF eklenebilir" }, 415);
-            const limit = `Resim en fazla ${MAX_IMAGE_BYTES / 1024 / 1024} MB olabilir`;
+            if (!ext) return json({ error: "Only PNG, JPEG, WebP and GIF images can be added" }, 415);
+            const limit = `Images can be at most ${MAX_IMAGE_BYTES / 1024 / 1024} MB`;
             if (Number(req.headers.get("content-length") ?? 0) > MAX_IMAGE_BYTES) return json({ error: limit }, 413);
             const bytes = await req.arrayBuffer();
             if (bytes.byteLength > MAX_IMAGE_BYTES) return json({ error: limit }, 413);
-            if (!bytes.byteLength) return json({ error: "Dosya boş" }, 422);
+            if (!bytes.byteLength) return json({ error: "File is empty" }, 422);
             const name = `${await imageId(bytes)}.${ext}`;
             const file = resolve(root, IMAGE_DIR, name);
             if (!existsSync(file)) {
@@ -399,11 +399,11 @@ for (let p = wantedPort; p < wantedPort + 20 && !server; p++) {
     if ((e as { code?: string }).code !== "EADDRINUSE") throw e;
   }
 }
-if (!server) throw new Error(`${wantedPort}-${wantedPort + 19} arası boş port yok`);
+if (!server) throw new Error(`no free port between ${wantedPort} and ${wantedPort + 19}`);
 
 const url = `http://localhost:${server.port}`;
 const count = store.list().filter((d) => d.kind === "task").length;
-console.log(`\n  ${loadConfig(configFile).title}  →  ${url}\n  ${count} iş · ${root}\n`);
+console.log(`\n  ${loadConfig(configFile).title}  →  ${url}\n  ${count} tasks · ${root}\n`);
 
 if (opts.open !== false) {
   const cmd = process.platform === "darwin" ? "open" : process.platform === "win32" ? "explorer" : "xdg-open";

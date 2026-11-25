@@ -40,7 +40,7 @@ export const DEFAULT_CONFIG: Config = {
     { id: "review", label: "Review / Test", color: "purple", closed: false, board: true },
     { id: "blocked", label: "Blocked", color: "red", closed: false, board: true },
     { id: "done", label: "Done", color: "green", closed: true, board: true },
-    { id: "cancelled", label: "İptal", color: "gray", closed: true, board: false },
+    { id: "cancelled", label: "Cancelled", color: "gray", closed: true, board: false },
   ],
   priorities: [
     { id: "high", label: "High", color: "orange" },
@@ -61,7 +61,7 @@ function check(ok: unknown, msg: string): asserts ok {
 function unique(ids: string[], what: string) {
   const seen = new Set<string>();
   for (const id of ids) {
-    check(!seen.has(id), `${what}: "${id}" iki kez var`);
+    check(!seen.has(id), `${what}: "${id}" appears twice`);
     seen.add(id);
   }
 }
@@ -70,46 +70,46 @@ const str = (v: unknown, fallback = "") => (typeof v === "string" ? v.trim() : f
 
 /** Gelen JSON'u doğrular ve eksik alanları tamamlayarak düzgün bir Config döner; hatada fırlatır. */
 export function normalizeConfig(raw: unknown): Config {
-  check(raw && typeof raw === "object", "config bir nesne olmalı");
+  check(raw && typeof raw === "object", "config must be an object");
   const r = raw as Record<string, unknown>;
   const arr = (k: string) => {
     const v = r[k] ?? (DEFAULT_CONFIG as Record<string, unknown>)[k];
-    check(Array.isArray(v), `${k} bir liste olmalı`);
+    check(Array.isArray(v), `${k} must be a list`);
     return v as Record<string, unknown>[];
   };
   const option = (o: Record<string, unknown>, what: string): Option => {
     const id = str(o.id);
-    check(ID.test(id), `${what}: geçersiz kimlik "${id}" (harf, rakam, - ve _)`);
+    check(ID.test(id), `${what}: invalid id "${id}" (letters, digits, - and _)`);
     const color = str(o.color, "gray") as Color;
-    check(COLORS.includes(color), `${what} "${id}": geçersiz renk "${color}"`);
+    check(COLORS.includes(color), `${what} "${id}": invalid color "${color}"`);
     return { id, label: str(o.label) || id, color };
   };
 
   const title = str(r.title) || DEFAULT_CONFIG.title;
   const prefix = r.prefix == null ? DEFAULT_CONFIG.prefix : str(r.prefix);
-  check(PREFIX.test(prefix), `Önek: geçersiz "${prefix}" (harfle başlar, yalnız harf ve rakam)`);
-  const tags = arr("tags").map((o) => option(o, "Etiket"));
+  check(PREFIX.test(prefix), `Prefix: invalid "${prefix}" (must start with a letter; letters and digits only)`);
+  const tags = arr("tags").map((o) => option(o, "Tag"));
   const statuses = arr("statuses").map((o) => ({
-    ...option(o, "Durum"),
+    ...option(o, "Status"),
     closed: o.closed === true,
     board: o.board !== false,
   }));
-  const priorities = arr("priorities").map((o) => option(o, "Öncelik"));
+  const priorities = arr("priorities").map((o) => option(o, "Priority"));
   const fields = arr("fields").map((o) => {
     const key = str(o.key);
-    check(ID.test(key), `Alan: geçersiz anahtar "${key}"`);
-    check(!RESERVED.includes(key), `Alan: "${key}" ayrılmış bir ad`);
+    check(ID.test(key), `Field: invalid key "${key}"`);
+    check(!RESERVED.includes(key), `Field: "${key}" is a reserved name`);
     const type = o.type === "select" ? "select" : "text";
     const options = Array.isArray(o.options) ? [...new Set(o.options.map((x) => str(x)).filter(Boolean))] : [];
     return { key, label: str(o.label) || key, type, options } satisfies Field;
   });
 
-  check(statuses.length > 0, "En az bir durum olmalı");
-  check(statuses.some((s) => !s.closed), "En az bir açık durum olmalı");
-  unique(tags.map((p) => p.id), "Etiket");
-  unique(statuses.map((s) => s.id), "Durum");
-  unique(priorities.map((p) => p.id), "Öncelik");
-  unique(fields.map((f) => f.key), "Alan");
+  check(statuses.length > 0, "There must be at least one status");
+  check(statuses.some((s) => !s.closed), "There must be at least one open status");
+  unique(tags.map((p) => p.id), "Tag");
+  unique(statuses.map((s) => s.id), "Status");
+  unique(priorities.map((p) => p.id), "Priority");
+  unique(fields.map((f) => f.key), "Field");
   return { title, prefix, tags, statuses, priorities, fields };
 }
 

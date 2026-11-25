@@ -28,15 +28,15 @@ export const DOT_STYLES: Record<Color, string> = {
   gray: "bg-label-gray",
 };
 export const COLOR_LABELS: Record<Color, string> = {
-  red: "Kırmızı",
-  orange: "Turuncu",
-  amber: "Sarı",
-  green: "Yeşil",
-  teal: "Camgöbeği",
-  blue: "Mavi",
-  purple: "Mor",
-  pink: "Pembe",
-  gray: "Gri",
+  red: "Red",
+  orange: "Orange",
+  amber: "Yellow",
+  green: "Green",
+  teal: "Teal",
+  blue: "Blue",
+  purple: "Purple",
+  pink: "Pink",
+  gray: "Gray",
 };
 const COLOR_VAR = (c: Color) => `var(--label-${c})`;
 

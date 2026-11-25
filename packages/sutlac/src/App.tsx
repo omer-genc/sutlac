@@ -20,18 +20,18 @@ import { SprintsPage } from "@/components/views/SprintsPage";
 import { isOpen, sprintLabel } from "@/lib/display";
 import { activeSprint, matchesTask, placeOf, sortTasks } from "@/lib/filter";
 import { useViewState, type Page, type ViewState } from "@/lib/url";
-import { cn } from "@/lib/utils";
+import { cn, plural } from "@/lib/utils";
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: false } } });
 
 const TITLES: Record<Page, string> = {
   board: "Board",
   backlog: "Backlog",
-  tasks: "Tüm işler",
-  sprints: "Sprintler",
-  archive: "Arşiv",
-  docs: "Dokümanlar",
-  settings: "Ayarlar",
+  tasks: "All tasks",
+  sprints: "Sprints",
+  archive: "Archive",
+  docs: "Docs",
+  settings: "Settings",
 };
 
 function Shell() {
@@ -140,7 +140,7 @@ function Shell() {
             {st.page === "tasks" && (
               <>
                 <Select
-                  items={{ open: "Açık", all: "Tümü", ...Object.fromEntries(cfg.statuses.map((s) => [s.id, s.label])) }}
+                  items={{ open: "Open", all: "All", ...Object.fromEntries(cfg.statuses.map((s) => [s.id, s.label])) }}
                   value={st.status}
                   onValueChange={(v) => {
                     if (v) set({ status: v })
@@ -150,8 +150,8 @@ function Shell() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="open">Açık</SelectItem>
-                    <SelectItem value="all">Tümü</SelectItem>
+                    <SelectItem value="open">Open</SelectItem>
+                    <SelectItem value="all">All</SelectItem>
                     {cfg.statuses.map((s) => (
                       <SelectItem key={s.id} value={s.id}>
                         {s.label}
@@ -160,28 +160,28 @@ function Shell() {
                   </SelectContent>
                 </Select>
                 <Select
-                  items={{ "num-desc": "En yeni", "num-asc": "En eski", priority: "Önceliğe göre", updated: "Son değişen" }}
+                  items={{ "num-desc": "Newest", "num-asc": "Oldest", priority: "By priority", updated: "Recently updated" }}
                   value={st.sort} onValueChange={(v) => set({ sort: v as ViewState["sort"] })}>
                   <SelectTrigger className="h-8 w-36">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="num-desc">En yeni</SelectItem>
-                    <SelectItem value="num-asc">En eski</SelectItem>
-                    <SelectItem value="priority">Önceliğe göre</SelectItem>
-                    <SelectItem value="updated">Son değişen</SelectItem>
+                    <SelectItem value="num-desc">Newest</SelectItem>
+                    <SelectItem value="num-asc">Oldest</SelectItem>
+                    <SelectItem value="priority">By priority</SelectItem>
+                    <SelectItem value="updated">Recently updated</SelectItem>
                   </SelectContent>
                 </Select>
                 <Select
-                  items={{ status: "Duruma göre grupla", tags: "Etikete göre grupla", none: "Gruplama yok" }}
+                  items={{ status: "Group by status", tags: "Group by tag", none: "No grouping" }}
                   value={st.group} onValueChange={(v) => set({ group: v as ViewState["group"] })}>
                   <SelectTrigger className="h-8 w-44">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="status">Duruma göre grupla</SelectItem>
-                    <SelectItem value="tags">Etikete göre grupla</SelectItem>
-                    <SelectItem value="none">Gruplama yok</SelectItem>
+                    <SelectItem value="status">Group by status</SelectItem>
+                    <SelectItem value="tags">Group by tag</SelectItem>
+                    <SelectItem value="none">No grouping</SelectItem>
                   </SelectContent>
                 </Select>
               </>
@@ -190,10 +190,10 @@ function Shell() {
               {st.page === "board" && active && (
                 <SprintHeader sprint={active} tasks={tasks.filter((d) => d.sprint === active.num)} cfg={cfg} onOpen={() => go("sprints", { sprint: active.num })} />
               )}
-              {st.page !== "board" && <span className="text-xs text-muted-foreground">{shownCount} iş</span>}
+              {st.page !== "board" && <span className="text-xs text-muted-foreground">{shownCount} {plural(shownCount, "task")}</span>}
               {st.page === "tasks" && (
-                <Button size="sm" onClick={() => setNewTask(true)} title="Yeni iş (c)">
-                  <Plus /> Yeni iş
+                <Button size="sm" onClick={() => setNewTask(true)} title="New task (c)">
+                  <Plus /> New task
                 </Button>
               )}
             </div>
@@ -209,7 +209,7 @@ function Shell() {
           {st.page === "backlog" && <BacklogPage cfg={cfg} list={backlog} active={active} onOpen={openTask} onNew={() => setNewTask(true)} />}
           {st.page === "tasks" && <ListView cfg={cfg} groups={groupTasks(cfg, st.group, all)} selected={task} onOpen={openTask} />}
           {st.page === "archive" && (
-            <ListView cfg={cfg} groups={groupTasks(cfg, "closed", archive)} selected={task} onOpen={openTask} empty="Arşivde iş yok. Kapanan işler sprintleri bitince buraya geçer." />
+            <ListView cfg={cfg} groups={groupTasks(cfg, "closed", archive)} selected={task} onOpen={openTask} empty="No tasks in the archive. Closed tasks move here once their sprint is finished." />
           )}
           {st.page === "sprints" && <SprintsPage cfg={cfg} docs={docs} selected={st.sprint} onSelect={(n) => set({ sprint: n })} onOpenTask={openTask} onOpenDoc={openDoc} />}
           {st.page === "docs" && <DocsPage cfg={cfg} docs={docs} selected={st.doc} onSelect={(p) => set({ doc: p })} onOpenDoc={openDoc} />}

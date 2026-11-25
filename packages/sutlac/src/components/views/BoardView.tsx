@@ -76,7 +76,7 @@ function Column({ status, cfg, count, onAdd, children }: { status: Status; cfg: 
         <span className="text-sm font-semibold">{status.label}</span>
         <span className="text-xs text-muted-foreground">{count}</span>
         {onAdd && (
-          <Button variant="ghost" size="icon" className="ml-auto size-6" onClick={onAdd} title="Yeni iş">
+          <Button variant="ghost" size="icon" className="ml-auto size-6" onClick={onAdd} title="New task">
             <Plus />
           </Button>
         )}

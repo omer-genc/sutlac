@@ -1,15 +1,15 @@
 #!/usr/bin/env bun
 /**
- * sutlac: repodaki `docs/` klasörünü iş takibi olarak kullanan komut satırı.
+ * sutlac: a command line that uses the repo's `docs/` folder as a task tracker.
  *
- *   sutlac [serve]   arayüzü açar            --port 4400 · --no-open · --dir <docs>
- *   sutlac init      docs/ iskeletini kurar  --prefix KES · --title "Ad" · --dir docs
- *   sutlac list      açık işler (satır başına bir iş)  --all · --tag <etiket> · --json
- *   sutlac next      sıradaki iş numarası (`KES-13`)
- *   sutlac check     belgelerdeki yollar ve resim bağlantıları repoda mı
- *   sutlac skills    Claude Code skill ve hook'larını `.claude/`e kopyalar
+ *   sutlac [serve]   opens the UI                  --port 4400 · --no-open · --dir <docs>
+ *   sutlac init      scaffolds docs/               --prefix KES · --title "Name" · --dir docs
+ *   sutlac list      open tasks (one per line)     --all · --tag <tag> · --json
+ *   sutlac next      next task number (`KES-13`)
+ *   sutlac check     checks that paths and image links in the docs exist in the repo
+ *   sutlac skills    copies the Claude Code skills and hooks into `.claude/`
  *
- * Klasör: `--dir` (ya da DOCS_DIR); verilmezse çalışılan klasörden yukarı doğru ilk `docs/config.json`.
+ * Folder: `--dir` (or DOCS_DIR); otherwise the first `docs/config.json` found walking up from the current folder.
  */
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
@@ -52,7 +52,7 @@ const commands: Record<string, () => void | Promise<void>> = {
   serve() {
     const assets = join(PKG, "dist");
     if (!existsSync(join(assets, "index.html"))) {
-      fail(`arayüz paketlenmemiş (${assets} yok). Paket klasöründe \`bun run build\`, geliştirirken \`bun run dev\`.`);
+      fail(`the UI is not built (${assets} is missing). Run \`bun run build\` in the package folder, or \`bun run dev\` while developing.`);
     }
     start({ root: root(), port: Number(flag("--port") ?? process.env.DOCS_PORT ?? 4400), open: !has("--no-open"), assets });
   },
@@ -71,8 +71,8 @@ const commands: Record<string, () => void | Promise<void>> = {
       if (writeNew(join(dir, f), text)) written.push(f);
     }
     for (const d of ["tasks", "sprints", "knowledge", "decisions", "images"]) mkdirSync(join(dir, d), { recursive: true });
-    console.log(written.length ? `${rel}/ kuruldu: ${written.join(", ")}` : `${rel}/ zaten kurulu; hiçbir dosya değişmedi.`);
-    console.log(`\n  Arayüz:   bunx sutlac\n  Skill'ler: bunx sutlac skills   (ya da Claude Code eklentisi; bkz. README)\n`);
+    console.log(written.length ? `${rel}/ set up: ${written.join(", ")}` : `${rel}/ is already set up; no files changed.`);
+    console.log(`\n  UI:     bunx sutlac\n  Skills: bunx sutlac skills   (or the Claude Code plugin; see README)\n`);
   },
 
   list() {
@@ -95,8 +95,8 @@ const commands: Record<string, () => void | Promise<void>> = {
       console.log(JSON.stringify({ sprint: sprint ? { num: sprint.num, title: sprint.title, end: sprint.end } : null, tasks }, null, 2));
       return;
     }
-    console.log(`# aktif sprint: ${sprint ? `${sprint.num} ${sprint.title}` : "yok"}`);
-    console.log("# iş|durum|öncelik|etiketler|sprint|başlık|yorum sayısı|son yorum");
+    console.log(`# active sprint: ${sprint ? `${sprint.num} ${sprint.title}` : "none"}`);
+    console.log("# task|status|priority|tags|sprint|title|comments|last comment");
     for (const t of tasks) {
       console.log([t.ref, t.status, t.priority, t.tags.join(","), t.sprint ?? "", t.title, t.comments, t.lastComment].join("|"));
     }
@@ -116,12 +116,12 @@ const commands: Record<string, () => void | Promise<void>> = {
     const repo = dirname(dir);
     const { findings, files, docs } = runCheck(repo, relative(repo, dir));
     if (findings.length) {
-      console.error(`Belgelerde repoda olmayan ${findings.length} yol:\n`);
+      console.error(`${findings.length} path(s) in the docs do not exist in the repo:\n`);
       for (const f of findings) console.error(`  ${f.file}:${f.line}  \`${f.path}\``);
-      console.error(`\nYolu düzelt; bilerek repoda olmayan bir yolsa ${relative(repo, dir)}/.checkignore dosyasına ekle.`);
+      console.error(`\nFix the path; if it is intentionally absent from the repo, add it to ${relative(repo, dir)}/.checkignore.`);
       process.exit(1);
     }
-    console.log(`sutlac check: ${files} belgede yollar, ${docs} belgede resim bağlantıları repoda.`);
+    console.log(`sutlac check: paths in ${files} file(s) and image links in ${docs} doc(s) all exist in the repo.`);
   },
 
   /** Eklenti kullanmayanlar için: skill'ler `.claude/skills/`e, hook'lar `.claude/hooks/sutlac/`e ve settings.json'a. */
@@ -152,7 +152,7 @@ const commands: Record<string, () => void | Promise<void>> = {
       }
     }
     writeFileSync(settingsFile, `${JSON.stringify(settings, null, 2)}\n`);
-    console.log(`hook: ${relative(process.cwd(), hookDir)}/ · settings.json'a ${added} kayıt eklendi`);
+    console.log(`hook: ${relative(process.cwd(), hookDir)}/ · added ${added} entries to settings.json`);
   },
 
   help() {
@@ -161,7 +161,7 @@ const commands: Record<string, () => void | Promise<void>> = {
 };
 
 const run = commands[cmd === "--help" || has("--help") || has("-h") ? "help" : cmd];
-if (!run) fail(`bilinmeyen komut "${cmd}". \`sutlac help\``);
+if (!run) fail(`unknown command "${cmd}". See \`sutlac help\``);
 try {
   await run();
 } catch (e) {

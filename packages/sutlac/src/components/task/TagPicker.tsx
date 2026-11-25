@@ -42,15 +42,15 @@ export function TagPicker({ cfg, value, onChange }: { cfg: Config; value: string
           })
         ) : (
           <span className="flex items-center gap-1 text-muted-foreground">
-            <Plus className="size-3" /> Etiket ekle
+            <Plus className="size-3" /> Add tag
           </span>
         )}
       </PopoverTrigger>
       <PopoverContent className="w-56 p-0" align="start">
         <Command>
-          <CommandInput placeholder="Etiket ara…" />
+          <CommandInput placeholder="Search tags…" />
           <CommandList>
-            <CommandEmpty>Etiket yok</CommandEmpty>
+            <CommandEmpty>No tags</CommandEmpty>
             <CommandGroup>
               {ids.map((id) => {
                 const t = tagOf(cfg, id);

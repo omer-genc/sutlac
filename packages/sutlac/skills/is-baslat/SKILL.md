@@ -26,7 +26,7 @@ Tek komut açık işleri (kapalı sayılmayan durumdakiler) ve aktif sprinti ver
 bunx sutlac list            # --tag <etiket> · --json
 ```
 
-Çıktı satır başına bir iştir: `iş|durum|öncelik|etiketler|sprint|başlık|yorum sayısı|son yorum`. İlk satır aktif sprinttir (`closed` alanı boş olan `docs/sprints/sprint-N.md`); yoksa her açık iş backlog'dadır. `sprint` alanı aktif sprintin numarası olan iş sprinttedir, boş olan backlog'da.
+Çıktı satır başına bir iştir: `task|status|priority|tags|sprint|title|comments|last comment`. İlk satır aktif sprinttir (`closed` alanı boş olan `docs/sprints/sprint-N.md`); yoksa her açık iş backlog'dadır. `sprint` alanı aktif sprintin numarası olan iş sprinttedir, boş olan backlog'da.
 
 Komut yoksa (paket kurulu değil) aynı bilgi dosyalardan okunur: `grep -H -e '^status:' -e '^title:' -e '^tags:' -e '^sprint:' -e '^priority:' docs/tasks/ÖNEK-*.md`.
 

@@ -14,11 +14,11 @@ function format(v: FieldValue): string {
 /** Frontmatter'da `key:` satırlarının değerini değiştirir; satır sonu `# yorum` korunur, olmayan alan (boş değilse) sona eklenir. */
 export function setFields(src: string, updates: Record<string, FieldValue>): string {
   const m = src.match(/^---(\r?\n)([\s\S]*?)\r?\n---/);
-  if (!m) throw new Error("frontmatter yok");
+  if (!m) throw new Error("no frontmatter");
   const nl = m[1]!;
   const lines = m[2]!.split(/\r?\n/);
   for (const [key, value] of Object.entries(updates)) {
-    if (!/^[\w-]+$/.test(key)) throw new Error(`geçersiz alan: ${key}`);
+    if (!/^[\w-]+$/.test(key)) throw new Error(`invalid field: ${key}`);
     const text = format(value).replace(/[\r\n]+/g, " ").trim();
     const i = lines.findIndex((l) => l.startsWith(`${key}:`));
     if (i < 0) {
@@ -122,6 +122,6 @@ export function slugify(title: string): string {
       .normalize("NFKD")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "")
-      .slice(0, 60) || "dokuman"
+      .slice(0, 60) || "doc"
   );
 }

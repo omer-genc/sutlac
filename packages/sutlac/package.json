@@ -1,6 +1,6 @@
 {
   "name": "sutlac",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Repodaki docs/ klasörünü iş takibine çeviren yerel arayüz, komut satırı ve Claude Code skill'leri.",
   "type": "module",
   "license": "MIT",

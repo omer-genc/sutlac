@@ -21,13 +21,13 @@ test("özel alan seçenekleri tekilleşir, tip bilinmiyorsa metin olur", () => {
 });
 
 test.each([
-  [{ tags: [{ id: "api" }, { id: "api" }] }, /iki kez/],
-  [{ tags: [{ id: "a b" }] }, /geçersiz kimlik/],
-  [{ tags: [{ id: "api", color: "black" }] }, /geçersiz renk/],
-  [{ statuses: [{ id: "done", closed: true }] }, /açık durum/],
-  [{ fields: [{ key: "status" }] }, /ayrılmış/],
-  [{ prefix: "K-S" }, /Önek/],
-  [{ prefix: "" }, /Önek/],
+  [{ tags: [{ id: "api" }, { id: "api" }] }, /appears twice/],
+  [{ tags: [{ id: "a b" }] }, /invalid id/],
+  [{ tags: [{ id: "api", color: "black" }] }, /invalid color/],
+  [{ statuses: [{ id: "done", closed: true }] }, /open status/],
+  [{ fields: [{ key: "status" }] }, /reserved/],
+  [{ prefix: "K-S" }, /Prefix/],
+  [{ prefix: "" }, /Prefix/],
 ])("geçersiz config reddedilir %#", (raw, msg) => {
   expect(() => normalizeConfig(raw)).toThrow(msg);
 });

@@ -1,5 +1,5 @@
 {
   "name": "sutlac",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Repodaki docs/ klasöründe iş takibi: iş açma, başlatma, paralel oturumlara dağıtma, toplama ve kapatma skill'leri."
 }

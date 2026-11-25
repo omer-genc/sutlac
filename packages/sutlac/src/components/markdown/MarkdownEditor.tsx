@@ -82,53 +82,53 @@ function EditorBubbleMenu({ editor }: { editor: Editor }) {
   const chain = () => editor.chain().focus();
   return (
     <BubbleMenu editor={editor} className="flex items-center gap-0.5 rounded-lg border bg-popover p-1 shadow-md">
-      <MenuButton active={state.bold} label="Kalın" onClick={() => chain().toggleBold().run()}>
+      <MenuButton active={state.bold} label="Bold" onClick={() => chain().toggleBold().run()}>
         <TextB />
       </MenuButton>
-      <MenuButton active={state.italic} label="İtalik" onClick={() => chain().toggleItalic().run()}>
+      <MenuButton active={state.italic} label="Italic" onClick={() => chain().toggleItalic().run()}>
         <TextItalic />
       </MenuButton>
-      <MenuButton active={state.strike} label="Üstü çizili" onClick={() => chain().toggleStrike().run()}>
+      <MenuButton active={state.strike} label="Strikethrough" onClick={() => chain().toggleStrike().run()}>
         <TextStrikethrough />
       </MenuButton>
-      <MenuButton active={state.code} label="Kod" onClick={() => chain().toggleCode().run()}>
+      <MenuButton active={state.code} label="Code" onClick={() => chain().toggleCode().run()}>
         <Code />
       </MenuButton>
-      <MenuButton active={state.h1} label="Başlık 1" onClick={() => chain().toggleHeading({ level: 1 }).run()}>
+      <MenuButton active={state.h1} label="Heading 1" onClick={() => chain().toggleHeading({ level: 1 }).run()}>
         <TextHOne />
       </MenuButton>
-      <MenuButton active={state.h2} label="Başlık 2" onClick={() => chain().toggleHeading({ level: 2 }).run()}>
+      <MenuButton active={state.h2} label="Heading 2" onClick={() => chain().toggleHeading({ level: 2 }).run()}>
         <TextHTwo />
       </MenuButton>
-      <MenuButton active={state.bullet} label="Liste" onClick={() => chain().toggleBulletList().run()}>
+      <MenuButton active={state.bullet} label="Bullet list" onClick={() => chain().toggleBulletList().run()}>
         <ListBullets />
       </MenuButton>
-      <MenuButton active={state.ordered} label="Numaralı liste" onClick={() => chain().toggleOrderedList().run()}>
+      <MenuButton active={state.ordered} label="Numbered list" onClick={() => chain().toggleOrderedList().run()}>
         <ListNumbers />
       </MenuButton>
-      <MenuButton active={state.taskList} label="Yapılacak listesi" onClick={() => chain().toggleTaskList().run()}>
+      <MenuButton active={state.taskList} label="To-do list" onClick={() => chain().toggleTaskList().run()}>
         <ListChecks />
       </MenuButton>
-      <MenuButton active={state.quote} label="Alıntı" onClick={() => chain().toggleBlockquote().run()}>
+      <MenuButton active={state.quote} label="Quote" onClick={() => chain().toggleBlockquote().run()}>
         <Quotes />
       </MenuButton>
       {state.table ? (
         <>
           <div className="mx-0.5 h-5 w-px bg-border" />
-          <MenuButton active={false} label="Sütun ekle" onClick={() => chain().addColumnAfter().run()}>
+          <MenuButton active={false} label="Add column" onClick={() => chain().addColumnAfter().run()}>
             <ColumnsPlusRight />
           </MenuButton>
-          <MenuButton active={false} label="Satır ekle" onClick={() => chain().addRowAfter().run()}>
+          <MenuButton active={false} label="Add row" onClick={() => chain().addRowAfter().run()}>
             <RowsPlusBottom />
           </MenuButton>
-          <MenuButton active={false} label="Tabloyu sil" onClick={() => chain().deleteTable().run()}>
+          <MenuButton active={false} label="Delete table" onClick={() => chain().deleteTable().run()}>
             <Trash />
           </MenuButton>
         </>
       ) : (
         <MenuButton
           active={false}
-          label="Tablo ekle"
+          label="Insert table"
           onClick={() => chain().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
         >
           <TableIcon />
@@ -163,7 +163,7 @@ function imageFiles(list: FileList | null | undefined): File[] {
 async function insertImages(view: EditorView, files: File[], docPath: string, pos?: number) {
   for (const file of files) {
     if (file.size > MAX_IMAGE_BYTES) {
-      toast.error(`${file.name}: resim en fazla ${MAX_IMAGE_BYTES / 1024 / 1024} MB olabilir`);
+      toast.error(`${file.name}: images can be at most ${MAX_IMAGE_BYTES / 1024 / 1024} MB`);
       continue;
     }
     try {
@@ -179,7 +179,7 @@ async function insertImages(view: EditorView, files: File[], docPath: string, po
       }
       view.dispatch(tr.scrollIntoView());
     } catch (e) {
-      toast.error(`Resim eklenemedi: ${e instanceof Error ? e.message : e}`);
+      toast.error(`Could not add image: ${e instanceof Error ? e.message : e}`);
     }
   }
 }
@@ -191,7 +191,7 @@ export function MarkdownSection({
   onOpenDoc,
   basePath = "",
   editable = true,
-  placeholder = "Yazmaya başla, biçimlendirmek için metni seç…",
+  placeholder = "Start writing, select text to format…",
   editorClassName = "prose min-h-40 max-w-none text-sm focus:outline-none",
 }: {
   value: string;

@@ -79,7 +79,7 @@ function Block({
               <span key={i}>{h}</span>
             ))}
           </div>
-          {rows.length ? rows : <p className="px-3 py-3 text-xs text-muted-foreground">Henüz yok.</p>}
+          {rows.length ? rows : <p className="px-3 py-3 text-xs text-muted-foreground">Nothing yet.</p>}
         </div>
       </div>
       <Button variant="outline" size="sm" className="mt-2" onClick={onAdd}>
@@ -132,15 +132,15 @@ export function SettingsPage({ cfg, docs }: { cfg: Config; docs: DocMeta[] }) {
     <span className="flex justify-end">
       {movable && (
         <>
-          <Button variant="ghost" size="icon-sm" disabled={i === 0} onClick={() => move(s, i, -1)} title="Yukarı">
+          <Button variant="ghost" size="icon-sm" disabled={i === 0} onClick={() => move(s, i, -1)} title="Move up">
             <ArrowUp />
           </Button>
-          <Button variant="ghost" size="icon-sm" disabled={i === n - 1} onClick={() => move(s, i, 1)} title="Aşağı">
+          <Button variant="ghost" size="icon-sm" disabled={i === n - 1} onClick={() => move(s, i, 1)} title="Move down">
             <ArrowDown />
           </Button>
         </>
       )}
-      <Button variant="ghost" size="icon-sm" onClick={() => remove(s, i)} title="Sil">
+      <Button variant="ghost" size="icon-sm" onClick={() => remove(s, i)} title="Delete">
         <Trash />
       </Button>
     </span>
@@ -159,16 +159,16 @@ export function SettingsPage({ cfg, docs }: { cfg: Config; docs: DocMeta[] }) {
   return (
     <div className="flex max-w-5xl flex-col gap-8 p-6">
       <p className="text-xs leading-relaxed text-muted-foreground">
-        Bu sayfa {code("docs/config.json")}'u düzenler; dosya repoda durur ve commit'lenir. Kimlik, dosyalarda yazan değerdir ({code("tags: [api]")}). Bir
-        kimliği değiştirmek ya da silmek mevcut iş dosyalarını değiştirmez; o dosyalar gri, ham değerle görünür.
+        This page edits {code("docs/config.json")}; the file lives in the repo and is committed. The ID is the value written in the files ({code("tags: [api]")}).
+        Changing or deleting an ID does not change existing task files; those show the raw value in gray.
       </p>
 
       <Block
-        title="Etiketler"
-        hint={<>İşin {code("tags")} alanı. Filtreler, rozetler ve yeni iş penceresi buradan.</>}
-        head={["Kimlik", "Ad", "Renk", "İş", ""]}
+        title="Tags"
+        hint={<>The task's {code("tags")} field. Filters, badges and the new task dialog use this list.</>}
+        head={["ID", "Name", "Color", "Tasks", ""]}
         grid={G_OPT}
-        addLabel="Etiket ekle"
+        addLabel="Add tag"
         onAdd={() => add("tags")}
         rows={draft.tags.map((p, i) =>
           row(G_OPT, i, <>
@@ -182,16 +182,16 @@ export function SettingsPage({ cfg, docs }: { cfg: Config; docs: DocMeta[] }) {
       />
 
       <Block
-        title="Durumlar"
+        title="Statuses"
         hint={
           <>
-            Sıra; liste gruplarının ve board kolonlarının sırasıdır. <b>Kapalı</b> durumlar "Açık" süzgecine girmez ve geçişte {code("closed")} tarihi yazılır.
-            Yeni iş ilk açık durumla açılır.
+            The order sets the order of list groups and board columns. <b>Closed</b> statuses are excluded from the "Open" filter, and the {code("closed")} date is
+            written when a task moves into one. A new task starts in the first open status.
           </>
         }
-        head={["Kimlik", "Ad", "Renk", "Kapalı", "Board", "İş", ""]}
+        head={["ID", "Name", "Color", "Closed", "Board", "Tasks", ""]}
         grid={G_STAT}
-        addLabel="Durum ekle"
+        addLabel="Add status"
         onAdd={() => add("statuses")}
         rows={draft.statuses.map((s, i) =>
           row(G_STAT, i, <>
@@ -207,11 +207,11 @@ export function SettingsPage({ cfg, docs }: { cfg: Config; docs: DocMeta[] }) {
       />
 
       <Block
-        title="Öncelikler"
-        hint='Sıra yüksekten düşüğe; "Önceliğe göre" sıralama ve board kart sırası buna göre.'
-        head={["Kimlik", "Ad", "Renk", "İş", ""]}
+        title="Priorities"
+        hint='Ordered from highest to lowest; "By priority" sorting and board card order follow it.'
+        head={["ID", "Name", "Color", "Tasks", ""]}
         grid={G_OPT}
-        addLabel="Öncelik ekle"
+        addLabel="Add priority"
         onAdd={() => add("priorities")}
         rows={draft.priorities.map((p, i) =>
           row(G_OPT, i, <>
@@ -225,34 +225,34 @@ export function SettingsPage({ cfg, docs }: { cfg: Config; docs: DocMeta[] }) {
       />
 
       <Block
-        title="Özel alanlar"
+        title="Custom fields"
         hint={
           <>
-            İşlere eklenen kendi alanların (ör. {code("sprint")}, {code("tip")}). Frontmatter'a {code("anahtar: değer")} olarak yazılır, iş panelinde düzenlenir;
-            seçenekli alanlar sidebar'da süzgeç olur.
+            Your own fields added to tasks (e.g. {code("sprint")}, {code("type")}). Written to frontmatter as {code("key: value")} and edited in the task panel;
+            select fields become filters in the sidebar.
           </>
         }
-        head={["Anahtar", "Ad", "Tip", "Seçenekler (virgülle)", "İş", ""]}
+        head={["Key", "Name", "Type", "Options (comma-separated)", "Tasks", ""]}
         grid={G_FLD}
-        addLabel="Alan ekle"
+        addLabel="Add field"
         onAdd={() => add("fields")}
         rows={draft.fields.map((f, i) =>
           row(G_FLD, i, <>
             <Input value={f.key} placeholder="sprint" onChange={(e) => update("fields", i, { key: e.target.value })} />
             <Input value={f.label} onChange={(e) => update("fields", i, { label: e.target.value })} />
-            <Select items={{ select: "Seçenekli", text: "Metin" }} value={f.type} onValueChange={(v) => update("fields", i, { type: v as "select" | "text" })}>
+            <Select items={{ select: "Select", text: "Text" }} value={f.type} onValueChange={(v) => update("fields", i, { type: v as "select" | "text" })}>
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="select">Seçenekli</SelectItem>
-                <SelectItem value="text">Metin</SelectItem>
+                <SelectItem value="select">Select</SelectItem>
+                <SelectItem value="text">Text</SelectItem>
               </SelectContent>
             </Select>
             {f.type === "select" ? (
               <OptionsInput value={f.options} onChange={(options) => update("fields", i, { options })} />
             ) : (
-              <span className="text-xs text-muted-foreground">serbest metin</span>
+              <span className="text-xs text-muted-foreground">free text</span>
             )}
             {use(uses.fields(f.key))}
             {actions("fields", i, draft.fields.length, false)}
@@ -262,12 +262,12 @@ export function SettingsPage({ cfg, docs }: { cfg: Config; docs: DocMeta[] }) {
 
       <div className="sticky bottom-0 flex items-center gap-2 border-t bg-background py-3">
         <Button onClick={submit} disabled={!dirty || save.isPending}>
-          Kaydet
+          Save
         </Button>
         <Button variant="ghost" onClick={() => setDraft(structuredClone(cfg))} disabled={!dirty}>
-          Değişiklikleri at
+          Discard changes
         </Button>
-        {dirty && <span className="text-xs text-muted-foreground">Kaydedilmemiş değişiklik var</span>}
+        {dirty && <span className="text-xs text-muted-foreground">Unsaved changes</span>}
       </div>
     </div>
   );

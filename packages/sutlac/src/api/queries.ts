@@ -96,7 +96,7 @@ export function useStartSprint() {
     mutationFn: api.startSprint,
     onSuccess: (s) => {
       qc.invalidateQueries({ queryKey: keys.docs });
-      toast.success(`Sprint ${s.num} başladı`);
+      toast.success(`Sprint ${s.num} started`);
     },
     onError: fail,
   });
@@ -108,7 +108,7 @@ export function useFinishSprint() {
     mutationFn: api.finishSprint,
     onSuccess: (s) => {
       qc.invalidateQueries();
-      toast.success(`Sprint ${s.num} kapandı${s.carried.length ? `; ${s.carried.length} iş backlog'a döndü` : ""}`);
+      toast.success(`Sprint ${s.num} closed${s.carried.length ? `; ${s.carried.length} ${s.carried.length === 1 ? "task" : "tasks"} moved back to the backlog` : ""}`);
     },
     onError: fail,
   });
@@ -129,7 +129,7 @@ export function useSaveConfig() {
     mutationFn: (c: Config) => api.saveConfig(c),
     onSuccess: (c) => {
       qc.setQueryData(keys.config, c);
-      toast.success("Ayarlar kaydedildi");
+      toast.success("Settings saved");
     },
     onError: fail,
   });

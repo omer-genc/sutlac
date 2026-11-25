@@ -75,7 +75,7 @@ export function NewTaskDialog({
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="flex max-h-[85vh] w-full max-w-2xl flex-col gap-0 p-0 sm:max-w-2xl">
         <DialogHeader className="shrink-0 flex-row items-center gap-1 px-4 py-2 pr-14">
-          <DialogTitle className="text-xs font-normal text-muted-foreground">Yeni iş</DialogTitle>
+          <DialogTitle className="text-xs font-normal text-muted-foreground">New task</DialogTitle>
         </DialogHeader>
         <div
           ref={bodyRef}
@@ -102,12 +102,12 @@ export function NewTaskDialog({
                 bodyRef.current?.querySelector<HTMLElement>(".tiptap")?.focus();
               }
             }}
-            placeholder="Başlıksız"
+            placeholder="Untitled"
             autoFocus
             className="w-full shrink-0 resize-none overflow-hidden bg-transparent text-2xl font-bold outline-none placeholder:text-muted-foreground/50"
           />
           <div className="mt-3 flex flex-col">
-            <PropertyRow icon={<CircleDashed className="size-4" />} label="Durum">
+            <PropertyRow icon={<CircleDashed className="size-4" />} label="Status">
               <OptionSelect
                 value={status}
                 options={cfg.statuses}
@@ -128,7 +128,7 @@ export function NewTaskDialog({
                 onChange={(v) => setInSprint(v != null)}
               />
             </PropertyRow>
-            <PropertyRow icon={<Flag className="size-4" />} label="Öncelik">
+            <PropertyRow icon={<Flag className="size-4" />} label="Priority">
               <OptionSelect
                 value={priority}
                 options={cfg.priorities}
@@ -139,7 +139,7 @@ export function NewTaskDialog({
                 }}
               />
             </PropertyRow>
-            <PropertyRow icon={<Folder className="size-4" />} label="Etiket">
+            <PropertyRow icon={<Folder className="size-4" />} label="Tags">
               <TagPicker cfg={cfg} value={tags} onChange={setTags} />
             </PropertyRow>
             {cfg.fields.map((f) => (
@@ -165,7 +165,7 @@ export function NewTaskDialog({
           <div className="mt-3 border-t pt-3">
             <MarkdownSection
               value=""
-              placeholder="Açıklama yaz… Boş bırakırsan Bağlam / Yapılacaklar / Notlar şablonuyla açılır."
+              placeholder="Write a description… Leave it empty to start from the default template."
               onSave={(md) => (content.current = md)}
               onChange={(md) => (content.current = md)}
               onOpenDoc={() => {}}
@@ -175,13 +175,13 @@ export function NewTaskDialog({
         </div>
         <DialogFooter className="items-center px-10 pb-6">
           <span className="mr-auto text-xs text-muted-foreground">
-            <kbd>⌘</kbd>+<kbd>Enter</kbd> ile oluştur
+            <kbd>⌘</kbd>+<kbd>Enter</kbd> to create
           </span>
           <Button variant="ghost" onClick={onClose}>
-            Vazgeç
+            Cancel
           </Button>
           <Button onClick={submit} disabled={!canSubmit}>
-            Oluştur
+            Create
           </Button>
         </DialogFooter>
       </DialogContent>

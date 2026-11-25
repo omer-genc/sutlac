@@ -58,7 +58,7 @@ Yorum metni (markdown). İçinde `## ` başlığı ve `### <tarih saat>` biçimi
 ## Sorgular
 
 ```bash
-bunx sutlac list                                                  # açık işler: iş|durum|öncelik|etiketler|sprint|başlık|yorum|son yorum
+bunx sutlac list                                                  # açık işler: task|status|priority|tags|sprint|title|comments|last comment
 bunx sutlac list --tag api                                        # bir etiketin açık işleri
 grep -l '^status: review' {{DOCS}}/tasks/{{PREFIX}}-*.md          # denenmeyi bekleyenler
 grep -H '^title:' {{DOCS}}/tasks/{{PREFIX}}-*.md                  # başlık listesi

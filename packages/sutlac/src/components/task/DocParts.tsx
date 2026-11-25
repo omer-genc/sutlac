@@ -32,7 +32,7 @@ import { TagPicker } from "./TagPicker";
 const NONE = "__none"; // Radix Select boş değer kabul etmiyor
 const KNOWN = new Set(["id", "title", "status", "tags", "priority", "sprint", "created", "closed", "source"]);
 const norm = (s: string) => s.replace(/[ \t]+$/gm, "").trim();
-export const fmtTime = (ms: number) => new Date(ms).toLocaleString("tr-TR", { dateStyle: "medium", timeStyle: "short" });
+export const fmtTime = (ms: number) => new Date(ms).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
 
 type Patch = Parameters<ReturnType<typeof usePatchDoc>["mutate"]>[0][1];
 
@@ -66,7 +66,7 @@ export function TitleField({ doc }: { doc: FullDoc }) {
           e.currentTarget.blur();
         }
       }}
-      placeholder="Başlıksız"
+      placeholder="Untitled"
       className="w-full shrink-0 resize-none overflow-hidden bg-transparent text-3xl font-bold outline-none placeholder:text-muted-foreground/50"
     />
   );
@@ -101,10 +101,10 @@ export function BodyEditor({ doc, onOpenDoc }: { doc: FullDoc; onOpenDoc: (path:
       onError: (e) => {
         if (!(e instanceof ApiError && e.status === 409)) return;
         base.current = baseBody;
-        toast.error("Metin başka yerde değişti; değişikliğin kaydedilmedi.", {
+        toast.error("The text changed elsewhere; your change was not saved.", {
           duration: Infinity,
           action: {
-            label: "Diskteki hali yükle",
+            label: "Load version on disk",
             onClick: () => {
               sent.current = null;
               base.current = latest.current;
@@ -128,7 +128,7 @@ export function DocActions({ doc, source, onSource }: { doc: FullDoc; source: bo
           className="flex items-center gap-1 rounded px-1 py-0.5 hover:bg-muted hover:text-foreground"
           onClick={() => {
             navigator.clipboard.writeText(docLabel(doc));
-            toast.success(`${docLabel(doc)} kopyalandı`);
+            toast.success(`${docLabel(doc)} copied`);
           }}
         >
           {docLabel(doc)}
@@ -142,17 +142,17 @@ export function DocActions({ doc, source, onSource }: { doc: FullDoc; source: bo
           size="sm"
           className={cn("text-muted-foreground", source && "bg-muted text-foreground")}
           onClick={onSource}
-          title="Dosyanın ham halini düzenle"
+          title="Edit the raw file"
         >
-          <FileCode /> Kaynak
+          <FileCode /> Source
         </Button>
         <Button variant="ghost" size="sm" className="text-muted-foreground"
           nativeButton={false}
           render={
-            <a href={`vscode://file${encodeURI(doc.file)}`} title="VS Code'da aç" />
+            <a href={`vscode://file${encodeURI(doc.file)}`} title="Open in VS Code" />
           }
         >
-          <Code /> Editörde aç
+          <Code /> Open in editor
         </Button>
         <Button
           variant="ghost"
@@ -160,10 +160,10 @@ export function DocActions({ doc, source, onSource }: { doc: FullDoc; source: bo
           className="text-muted-foreground"
           onClick={() => {
             navigator.clipboard.writeText(doc.file);
-            toast.success("Dosya yolu kopyalandı");
+            toast.success("File path copied");
           }}
         >
-          <Copy /> Yolu kopyala
+          <Copy /> Copy path
         </Button>
       </div>
     </>
@@ -244,7 +244,7 @@ export function TaskProps({
 
   return (
     <>
-      <PropertyRow icon={<CircleDashed className="size-4" />} label="Durum">
+      <PropertyRow icon={<CircleDashed className="size-4" />} label="Status">
         <OptionSelect
           value={doc.status}
           options={cfg.statuses}
@@ -261,7 +261,7 @@ export function TaskProps({
         {own?.closed ? (
           // Kapanmış sprint: sayfasına git.
           <button className="rounded px-2 py-0.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground" onClick={() => onOpenSprint(own.num!)}>
-            {sprintLabel(own)} (kapandı)
+            {sprintLabel(own)} (closed)
           </button>
         ) : (
           <OptionSelect
@@ -272,10 +272,10 @@ export function TaskProps({
           />
         )}
       </PropertyRow>
-      <PropertyRow icon={<Folder className="size-4" />} label="Etiket">
+      <PropertyRow icon={<Folder className="size-4" />} label="Tags">
         <TagPicker cfg={cfg} value={doc.tags} onChange={(next) => set("tags", next)} />
       </PropertyRow>
-      <PropertyRow icon={<Flag className="size-4" />} label="Öncelik">
+      <PropertyRow icon={<Flag className="size-4" />} label="Priority">
         <OptionSelect
           value={doc.priority}
           options={cfg.priorities}
@@ -297,7 +297,7 @@ export function TaskProps({
         </PropertyRow>
       ))}
       {doc.todos.total > 0 && (
-        <PropertyRow icon={<ListChecks className="size-4" />} label="Yapılacaklar">
+        <PropertyRow icon={<ListChecks className="size-4" />} label="To-dos">
           <div className="w-full px-2">
             <span className="text-sm">
               {doc.todos.done} / {doc.todos.total}
@@ -308,16 +308,16 @@ export function TaskProps({
           </div>
         </PropertyRow>
       )}
-      <PropertyRow icon={<CalendarBlank className="size-4" />} label="Oluşturma">
+      <PropertyRow icon={<CalendarBlank className="size-4" />} label="Created">
         <span className="px-2 text-sm text-muted-foreground">{doc.created ?? "—"}</span>
       </PropertyRow>
       {doc.closed && (
-        <PropertyRow icon={<CalendarX className="size-4" />} label="Kapanış">
+        <PropertyRow icon={<CalendarX className="size-4" />} label="Closed">
           <span className="px-2 text-sm text-muted-foreground">{doc.closed}</span>
         </PropertyRow>
       )}
       {doc.fields.source && (
-        <PropertyRow icon={<LinkIcon className="size-4" />} label="Kaynak">
+        <PropertyRow icon={<LinkIcon className="size-4" />} label="Source">
           <span className="px-2 text-sm">{doc.fields.source}</span>
         </PropertyRow>
       )}
@@ -328,7 +328,7 @@ export function TaskProps({
             <span className="px-2 text-sm break-all">{v}</span>
           </PropertyRow>
         ))}
-      <PropertyRow icon={<ClockCounterClockwise className="size-4" />} label="Güncelleme">
+      <PropertyRow icon={<ClockCounterClockwise className="size-4" />} label="Updated">
         <span className="px-2 text-sm text-muted-foreground">{fmtTime(doc.updated)}</span>
       </PropertyRow>
     </>
@@ -372,23 +372,23 @@ export function SourceEditor({ doc, onDone }: { doc: FullDoc; onDone: () => void
     <div className="flex min-h-0 flex-1 flex-col border-t">
       <div className="flex shrink-0 items-center gap-2 px-4 py-2 text-xs text-muted-foreground">
         {error || changedOnDisk ? (
-          <span className="text-destructive">{error ?? "Dosya diskte değişti."}</span>
+          <span className="text-destructive">{error ?? "The file changed on disk."}</span>
         ) : (
           <span>
-            <kbd>⌘S</kbd> kaydet
+            <kbd>⌘S</kbd> to save
           </span>
         )}
         {(error || changedOnDisk) && (
           <Button size="sm" variant="outline" onClick={reload}>
-            Diskteki hali yükle
+            Load version on disk
           </Button>
         )}
         <div className="ml-auto flex gap-2">
           <Button size="sm" variant="ghost" onClick={onDone}>
-            Vazgeç
+            Cancel
           </Button>
           <Button size="sm" onClick={save} disabled={!dirty || write.isPending}>
-            Kaydet
+            Save
           </Button>
         </div>
       </div>

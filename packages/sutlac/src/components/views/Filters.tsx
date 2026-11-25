@@ -18,7 +18,7 @@ function FilterChip({ label, className, onRemove }: { label: string; className?:
       {label}
       <button type="button" data-icon="inline-end" onClick={onRemove} className="opacity-60 transition-opacity hover:opacity-100">
         <X className="size-2.5" weight="bold" />
-        <span className="sr-only">{label} filtresini kaldır</span>
+        <span className="sr-only">Remove {label} filter</span>
       </button>
     </Badge>
   );
@@ -39,7 +39,7 @@ export function Filters({ cfg, st, set }: { cfg: Config; st: ViewState; set: (p:
           value={st.q}
           onChange={(e) => set({ q: e.target.value })}
           onKeyDown={(e) => e.key === "Escape" && e.currentTarget.blur()}
-          placeholder={`Ara veya ${cfg.prefix}-12  ( / )`}
+          placeholder={`Search or ${cfg.prefix}-12  ( / )`}
           data-search
           className="h-8 w-56 pl-8"
         />
@@ -50,24 +50,24 @@ export function Filters({ cfg, st, set }: { cfg: Config; st: ViewState; set: (p:
             <Button variant="ghost" size="sm" className="text-muted-foreground" />
           }
         >
-          <Funnel /> Filtre
+          <Funnel /> Filter
         </PopoverTrigger>
         <PopoverContent className="w-64 p-0" align="start">
           <Command>
-            <CommandInput placeholder="Filtrele..." />
+            <CommandInput placeholder="Filter..." />
             <CommandList>
-              <CommandEmpty>Sonuç yok</CommandEmpty>
-              <CommandGroup heading="Öncelik">
+              <CommandEmpty>No results</CommandEmpty>
+              <CommandGroup heading="Priority">
                 {cfg.priorities.map((p) => (
-                  <CommandItem key={p.id} value={`öncelik ${p.label}`} onSelect={() => set({ priorities: toggle(st.priorities, p.id) })}>
+                  <CommandItem key={p.id} value={`priority ${p.label}`} onSelect={() => set({ priorities: toggle(st.priorities, p.id) })}>
                     <span className={cn("rounded-md px-1.5 py-0.5 text-xs font-medium", LABEL_STYLES[p.color])}>{p.label}</span>
                     {check(st.priorities.includes(p.id))}
                   </CommandItem>
                 ))}
               </CommandGroup>
-              <CommandGroup heading="Etiket">
+              <CommandGroup heading="Tag">
                 {cfg.tags.map((p) => (
-                  <CommandItem key={p.id} value={`etiket ${p.label} ${p.id}`} onSelect={() => set({ tags: toggle(st.tags, p.id) })}>
+                  <CommandItem key={p.id} value={`tag ${p.label} ${p.id}`} onSelect={() => set({ tags: toggle(st.tags, p.id) })}>
                     <span className={cn("rounded-md px-1.5 py-0.5 text-xs font-medium", LABEL_STYLES[p.color])}>{p.label}</span>
                     {check(st.tags.includes(p.id))}
                   </CommandItem>
@@ -81,7 +81,7 @@ export function Filters({ cfg, st, set }: { cfg: Config; st: ViewState; set: (p:
                       value={`${f.label} ${o}`}
                       onSelect={() => set({ fx: { ...st.fx, [f.key]: toggle(st.fx[f.key] ?? [], o) } })}
                     >
-                      {o === "-" ? "Boş" : o}
+                      {o === "-" ? "Empty" : o}
                       {check((st.fx[f.key] ?? []).includes(o))}
                     </CommandItem>
                   ))}
@@ -103,14 +103,14 @@ export function Filters({ cfg, st, set }: { cfg: Config; st: ViewState; set: (p:
         (st.fx[f.key] ?? []).map((o) => (
           <FilterChip
             key={`${f.key}:${o}`}
-            label={`${f.label}: ${o === "-" ? "Boş" : o}`}
+            label={`${f.label}: ${o === "-" ? "Empty" : o}`}
             onRemove={() => set({ fx: { ...st.fx, [f.key]: toggle(st.fx[f.key] ?? [], o) } })}
           />
         )),
       )}
       {active && (
         <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => set({ tags: [], priorities: [], fx: {} })}>
-          Temizle
+          Clear
         </Button>
       )}
     </div>

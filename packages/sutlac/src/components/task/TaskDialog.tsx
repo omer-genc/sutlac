@@ -37,10 +37,10 @@ export function TaskDialog({
             <DialogHeader className="shrink-0 flex-row items-center gap-1 px-4 py-2 pr-14 text-xs text-muted-foreground">
               <DialogTitle className="sr-only">{doc.title}</DialogTitle>
               <DocActions doc={doc} source={source} onSource={() => setSource((s) => !s)} />
-              <Button variant="ghost" size="icon-sm" className="text-muted-foreground" title="Önceki (k)" onClick={() => onStep(-1)}>
+              <Button variant="ghost" size="icon-sm" className="text-muted-foreground" title="Previous (k)" onClick={() => onStep(-1)}>
                 <CaretUp />
               </Button>
-              <Button variant="ghost" size="icon-sm" className="text-muted-foreground" title="Sonraki (j)" onClick={() => onStep(1)}>
+              <Button variant="ghost" size="icon-sm" className="text-muted-foreground" title="Next (j)" onClick={() => onStep(1)}>
                 <CaretDown />
               </Button>
             </DialogHeader>

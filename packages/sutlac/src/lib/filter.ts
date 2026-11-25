@@ -39,11 +39,18 @@ export function matchesTask(cfg: Config, st: ViewState, d: DocMeta, skip?: strin
   return matchesQuery(st.q, d);
 }
 
+/** Aramada büyük/küçük harf ve aksan fark etmez: "İstanbul", "istanbul" ve "ISTANBUL" aynıdır; "o" "ö"yü de bulur. */
+export const fold = (s: string) =>
+  s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ı/g, "i");
+
 export function matchesQuery(q: string, d: DocMeta): boolean {
   if (!q) return true;
-  const hay = `${docLabel(d)} ${d.title} ${d.source ?? ""} ${d.path}`.toLocaleLowerCase("tr-TR");
-  return q
-    .toLocaleLowerCase("tr-TR")
+  const hay = fold(`${docLabel(d)} ${d.title} ${d.source ?? ""} ${d.path}`);
+  return fold(q)
     .split(/\s+/)
     .every((w) => hay.includes(w));
 }

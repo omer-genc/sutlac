@@ -85,7 +85,7 @@ function commentsStart(text: string): number {
 
 /** H1 satırındaki başlığı değiştirir; numara öneki ve çevresi aynen kalır. */
 export function withTitle(p: Parts, title: string): Parts {
-  if (!p.h1) throw new Error("başlık H1 satırında değil");
+  if (!p.h1) throw new Error("the title is not on an H1 line");
   const text = title.replace(/[\r\n]+/g, " ").trim();
   return { ...p, h1: { ...p.h1, text }, top: p.top.replace(H1_RE, (_, ws, prefix = "") => `${ws}# ${prefix}${text}`) };
 }

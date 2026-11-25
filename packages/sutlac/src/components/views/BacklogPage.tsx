@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dot, PriorityBadge, TagBadges, StatusIcon, tagOf, sprintLabel } from "@/lib/display";
 import { sortTasks } from "@/lib/filter";
+import { plural } from "@/lib/utils";
 import { Meta } from "./ListView";
 
 // inci-doc BacklogPage: aktif sprintte olmayan açık işler, etikete göre gruplu. Seçilenler
@@ -43,7 +44,7 @@ export function BacklogPage({
     setBusy(true);
     try {
       for (const p of paths) await patch.mutateAsync([p, { fields: { sprint: String(active.num) } }]);
-      toast.success(`${paths.length} iş sprinte alındı`, { description: sprintLabel(active) });
+      toast.success(`${paths.length} ${plural(paths.length, "task")} added to sprint`, { description: sprintLabel(active) });
       setSelected(new Set());
     } catch {
       // Hata toast'ı usePatchDoc'ta; kısmi başarıda seçim durur.
@@ -56,29 +57,29 @@ export function BacklogPage({
     <div className="flex h-full min-h-0 flex-col">
       <div className="flex shrink-0 items-center gap-2 border-b px-3 py-2">
         <Button size="sm" variant="outline" onClick={onNew}>
-          <Plus /> Yeni iş
+          <Plus /> New task
         </Button>
         <div className="ml-auto flex items-center gap-3">
           {active ? (
             <>
             <span className="text-sm text-muted-foreground">{sprintLabel(active)}</span>
             <Button size="sm" disabled={!chosen.length || busy} onClick={() => pull(chosen.map((d) => d.path))}>
-              <Play /> Seçilenleri sprinte al ({chosen.length})
+              <Play /> Add selected to sprint ({chosen.length})
             </Button>
             </>
           ) : (
-            <span className="text-sm text-muted-foreground">Önce Board'dan sprint başlat</span>
+            <span className="text-sm text-muted-foreground">Start a sprint from the Board first</span>
           )}
         </div>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto p-4">
-        {groups.length === 0 && <p className="py-16 text-center text-sm text-muted-foreground">Backlog boş.</p>}
+        {groups.length === 0 && <p className="py-16 text-center text-sm text-muted-foreground">Backlog is empty.</p>}
         {groups.map(({ key, rows }) => (
           <section key={key} className="mb-6">
             <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
               <Dot color={tagOf(cfg, key).color} />
-              {key === "—" ? "Etiketsiz" : tagOf(cfg, key).label}
-              <span className="text-xs font-normal text-muted-foreground">{rows.length} iş</span>
+              {key === "—" ? "Untagged" : tagOf(cfg, key).label}
+              <span className="text-xs font-normal text-muted-foreground">{rows.length} {plural(rows.length, "task")}</span>
             </h3>
             <div className="flex flex-col divide-y rounded-lg border">
               {rows.map((d) => (
@@ -105,7 +106,7 @@ export function BacklogPage({
                   </span>
                   {active && (
                     <Button variant="ghost" size="sm" className="opacity-0 transition-opacity group-hover:opacity-100" disabled={busy} onClick={() => pull([d.path])}>
-                      Sprinte al
+                      Add to sprint
                     </Button>
                   )}
                 </div>

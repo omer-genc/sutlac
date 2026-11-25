@@ -1,6 +1,6 @@
 import { CalendarBlank } from "@phosphor-icons/react";
 import { format } from "date-fns";
-import { tr } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 export function DatePicker({
   value,
   onChange,
-  placeholder = "Tarih seç",
+  placeholder = "Pick a date",
   className,
 }: {
   value: Date | undefined;
@@ -33,7 +33,7 @@ export function DatePicker({
         }
       >
         <CalendarBlank />
-        {value ? format(value, "d MMMM yyyy", { locale: tr }) : placeholder}
+        {value ? format(value, "MMMM d, yyyy", { locale: enUS }) : placeholder}
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
@@ -43,7 +43,7 @@ export function DatePicker({
             onChange(d);
             setOpen(false);
           }}
-          locale={tr}
+          locale={enUS}
           defaultMonth={value}
         />
       </PopoverContent>
