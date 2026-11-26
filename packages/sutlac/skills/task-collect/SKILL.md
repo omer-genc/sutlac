@@ -17,7 +17,7 @@ git worktree list --porcelain | awk '/^worktree /{w=$2} /^branch /{print w, $2}'
 grep -l "^# PREFIX-N report" <each worktree>/.worktree/report.md
 ```
 
-If there is no report, the sub-session has not finished or has not written it: look at the session's state with `mcp__ccd_session_mgmt__list_sessions` (`linked: true`); if it is running, wait; if it has finished, ask it for the report with `SendMessage`.
+If there is no report, the sub-session has not finished or has not written it: look at the session's state with `mcp__ccd_session_mgmt__list_sessions` (`linked: true`); if it is running, wait; if it has finished, ask it for the report with `SendMessage` (`to`: its `local_…` session id).
 
 Read the report from start to finish. If it says `Status: stuck`, show the user the reason; decide together (instructions to the sub-session, a scope change, cancel). Do not move on to collecting.
 

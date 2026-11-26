@@ -1,6 +1,6 @@
 {
   "name": "sutlac",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Issue tracking in your repo's docs/ folder: local UI, CLI and Claude Code skills to open, start, hand out, collect and close tasks.",
   "type": "module",
   "license": "MIT",

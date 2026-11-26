@@ -87,12 +87,14 @@ An empty section says "None"; it is not removed.
 
 ## Step 5: Finish
 
-Keep the final message short; the first 400 characters reach the main session:
+The main session gets the first 400 characters of your turn's end: in the desktop app the wrap-up recap first, then the final message. Put this line at the start of both (the recap may shorten it, the path must stay):
 
 ```
 PREFIX-N ready · branch <branch> · <n> commits · check ✓ · Acceptance ✓3 ⏳1 · findings 2
 Report: <absolute worktree path>/.worktree/report.md
 ```
+
+In the wrap-up ask nothing and offer no buttons (commit, PR, push, merge): collecting is the main session's job. If stuck, the line starts `PREFIX-N stuck · <reason>`.
 
 Then stop. If the main session sends feedback (`SendMessage`), fix it, make a new commit, update the report.
 

@@ -50,11 +50,14 @@ Claim the tasks: `status: in-progress`, as in `/task-start` Step 4 (reread the f
 
 ## Step 4: Start the sessions
 
-For two or more sessions, first `mcp__ccd_session__mark_chapter` ("Parallel: PREFIX-A, PREFIX-B"). One `start_session` per task:
+**Start them in the user's turn.** The desktop app starts a session (`initiation: user_asked`) only in a turn that the user's own message began (`/task-dispatch`, "yes, start"). A turn begun by anything else (a background agent or reviewer finishing, another session's note, a CI event) is refused. So do Steps 1-3 in the same turn, and run any reviewer or critic agent in the foreground, not in the background: its completion would begin a new turn in which the start is refused.
 
-- `initiation`: `user_asked` (the user asked for the hand-out), `context`: `fresh`, `use_worktree`: `true`.
-- `model`: always give it explicitly; if omitted the sub-session takes the main session's model. Planning and decisions stay in the main session, the sub-session only does the task: if neither the user nor the project (`CLAUDE.md`) named a model, pick the one a tier cheaper than the main session's.
-- `title`: `PREFIX-N · <task title, shortened>`.
+For two or more sessions, first `mcp__ccd_session__mark_chapter` ("Parallel: PREFIX-A, PREFIX-B"), unless this is the session's first message. One `mcp__ccd_session__start_session` per task:
+
+- `initiation`: `user_asked` (the user asked for the hand-out), `context`: `fresh`, `use_worktree`: `true`, `wake_when_done`: `true`.
+- `title`: `PREFIX-N · <task title, shortened>` (under 60 characters); `name`: `prefix-n` (lowercase, the short handle you refer to it by); `branch_name`: `prefix-n-<short-slug>`.
+- `model`: always give it explicitly; if omitted the sub-session takes the main session's model. Planning and decisions stay in the main session, the sub-session only does the task: if neither the user nor the project (`CLAUDE.md`) named a model, pick the one a tier cheaper than the main session's (a higher one than the main session's is ignored). Leave `permission_mode` and `effort` out unless the user named them.
+- `background` (required with `fresh`, at least 80 characters): the project, why this task is being done now, decisions taken in the main session, the other tasks running in parallel. Not a copy of the task file.
 - `prompt` (brief) with this template; in your own sentences, short:
 
 ```
@@ -67,15 +70,17 @@ Don't touch: <the areas of the other parallel tasks, from Step 2>
 Note: <any decision discussed in the main session that is not in the task file>
 ```
 
-If the `start_session` tool is not available (outside the desktop app), give the user the brief for each task; the user pastes it into a worktree session they open themselves (`claude --worktree`).
+**If the start is refused** (the result says sessions start only on the user's own words): do not retry in this turn and do not propose cards (`own_initiative` is for work the user did not ask for; the hand-out was asked for). Ask once: the turn's wrap-up gets a single question ("Start PREFIX-A and PREFIX-B now?") with one button ("Start them"), and the closing message does not repeat it. The user's answer begins a turn of their own: start the sessions then with `user_asked`, as above.
+
+If the `start_session` tool is not available (outside the desktop app, or the app's session tools are turned off), give the user the brief for each task; the user pastes it into a worktree session they open themselves (`claude --worktree`).
 
 Before each session write one bold title line and one sentence (session rules). Do not say it started until the tool result says it started.
 
 ## Step 5: Wait and collect
 
-Tell the user which session is on which task, with links, and stop; do not poll. The note that arrives when a session finishes is that session's report, not evidence: inspect the report and the branch with `/task-collect PREFIX-N`.
+Tell the user which session is on which task, linked as `[PREFIX-N · title](#<session id>)` with the `local_…` session id exactly as the tool result gives it, in one line, and end the turn; do not poll and do not wait. When a session ends its turn the app continues the main session with a note quoting the start of its report. That note is the session's statement, not evidence: inspect the report and the branch with `/task-collect PREFIX-N`. In such a turn you may inspect, but bringing into main, committing and archiving still wait for the user's own yes.
 
-If a sub-session gets stuck (`Status: stuck`) or asks a question, answer that session with `SendMessage`; do not open a new session.
+If a sub-session gets stuck (`Status: stuck`) or asks a question, answer that session with `SendMessage` (`to`: its `local_…` session id); do not open a new session.
 
 ## Rules
 
