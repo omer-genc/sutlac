@@ -52,12 +52,13 @@ a { color: inherit; }
   backdrop-filter: blur(8px);
 }
 .brand { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 700; letter-spacing: -0.01em; text-decoration: none; font-size: 1.1rem; }
-/* The bowl: rice pudding with cinnamon on top */
-.bowl {
-  width: 1.25rem; height: 0.8rem; border-radius: 0.15rem 0.15rem 1rem 1rem;
-  background: linear-gradient(var(--accent) 0 28%, #f4e9d2 28% 100%);
-  border: 1.5px solid var(--text);
-}
+/* Logo: Sütlaç'ın başı; beyaz tüy, gri başlık, yeşil göz */
+.cat { width: 1.5rem; height: 1.375rem; overflow: visible; }
+.cat .fur { fill: #fff; }
+.cat .cap { fill: #9c958d; }
+.cat .line { fill: none; stroke: var(--text); stroke-width: 1.5; stroke-linejoin: round; }
+.cat .eye { fill: #6f8a4e; }
+.cat .nose { fill: #d98f8f; }
 nav { display: flex; gap: clamp(0.75rem, 2vw, 1.5rem); font-size: 0.9rem; }
 nav a { color: var(--muted); text-decoration: none; padding-block: 0.25rem; }
 nav a:hover { color: var(--text); }
@@ -134,5 +135,9 @@ td:first-child { white-space: nowrap; }
 
 .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 0.75rem; align-items: start; }
 .split pre { margin: 0; }
+
+.cats { margin: 1.5rem 0 0; }
+.cats img { display: block; width: 100%; height: auto; border-radius: 1rem; border: 1px solid var(--line); }
+.cats figcaption { margin-top: 0.6rem; color: var(--muted); font-size: 0.85rem; }
 
 footer { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding-block: 2rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.85rem; }

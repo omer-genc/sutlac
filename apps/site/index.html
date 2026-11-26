@@ -10,12 +10,20 @@
   </head>
   <body>
     <header class="top">
-      <a class="brand" href="#top" aria-label="Sütlaç home"><span class="bowl" aria-hidden="true"></span>sütlaç</a>
+      <a class="brand" href="#top" aria-label="Sütlaç home">
+        <svg class="cat" viewBox="0 0 24 22" aria-hidden="true">
+          <path class="fur" d="M4 2 8.5 6.5Q12 5.5 15.5 6.5L20 2 21 11Q21 20.5 12 20.5 3 20.5 3 11Z" />
+          <path class="cap" d="M4 2 8.5 6.5Q12 5.5 15.5 6.5L20 2 20.6 8.5Q15.5 8 12 11 8.5 8 3.4 8.5Z" />
+          <path class="line" d="M4 2 8.5 6.5Q12 5.5 15.5 6.5L20 2 21 11Q21 20.5 12 20.5 3 20.5 3 11Z" />
+          <circle class="eye" cx="9" cy="13.5" r="1.1" /><circle class="eye" cx="15" cy="13.5" r="1.1" />
+          <path class="nose" d="M11 15.8h2l-1 1.1Z" />
+        </svg>sütlaç</a>
       <nav aria-label="Sections">
         <a href="#install">Install</a>
         <a href="#flow">Skills</a>
         <a href="#commands">Commands</a>
         <a href="#files">File format</a>
+        <a href="#name">The cat</a>
       </nav>
     </header>
 
@@ -156,10 +164,22 @@ Closing note, with the evidence.</code></pre>
         </div>
         <p class="sub">A task never moves; a finished one stays where it is, so <code>KES-12</code> references don't break. The archive is computed, files aren't moved.</p>
       </section>
+
+      <section id="name">
+        <h2>Named after a cat</h2>
+        <p class="sub">
+          Sütlaç is the fluffy white one on the right. Fındık, the tabby on the left, keeps an eye on the backlog. In Turkish the names mean rice pudding and hazelnut.
+        </p>
+        <figure class="cats">
+          <img src="./images/sutlac-findik.webp" width="1440" height="600" loading="lazy" decoding="async"
+            alt="Two cats curled up together on a grey sofa: Fındık, a striped brown tabby, on the left and Sütlaç, a fluffy white cat with a grey cap, on the right" />
+          <figcaption>Fındık (left) and Sütlaç (right)</figcaption>
+        </figure>
+      </section>
     </main>
 
     <footer>
-      <span>sütlaç · MIT</span>
+      <span>sütlaç · MIT · named after a white cat</span>
       <span>Runs on Bun</span>
     </footer>
   </body>
