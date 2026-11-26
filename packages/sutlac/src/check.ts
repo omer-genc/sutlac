@@ -49,20 +49,29 @@ function eachLine(text: string, fn: (line: string, idx: number) => void) {
 
 const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-/** Metinde yol olarak anılan alt projeler (`apps/api`, `apps/api/src/x.ts`), geçtikleri sırayla. */
-function mentions(text: string, subs: readonly string[]): string[] {
+/** Metinde yol olarak anılan alt projeler (`apps/api`, `apps/api/src/x.ts`), geçtikleri sırayla ve konumlarıyla. */
+function mentionsAt(text: string, subs: readonly string[]): { sub: string; at: number }[] {
   if (!subs.length) return [];
   const re = new RegExp(`(?<![\\w./-])(${subs.map(escapeRe).join("|")})(?![\\w-])`, "g");
-  return [...text.matchAll(re)].map((m) => m[1]!);
+  return [...text.matchAll(re)].map((m) => ({ sub: m[1]!, at: m.index! }));
 }
+const mentions = (text: string, subs: readonly string[]) => mentionsAt(text, subs).map((m) => m.sub);
 
 /**
  * Kökte olmayan göreli bir yolun (`src/…`, `scripts/…`) hangi alt projeye ait olduğu: belge tek alt
- * projeden söz ediyorsa o; birden fazlaysa aynı `##` bölümünde yukarı doğru en son anılan. Bulunamazsa undefined.
+ * projeden söz ediyorsa o; birden fazlaysa yolun kendi satırında yoldan önce en son anılan, yoksa aynı
+ * satırda yoldan sonra ilk anılan, yoksa aynı `##` bölümünde yukarı doğru en son anılan. Bulunamazsa undefined.
+ * Aynı satırda yoldan sonra gelen başka bir alt proje (`… yorum \`shared/x.ts\` der; kod \`packages/y\` altında`)
+ * yoldan önce anılanın yerine geçmez.
  */
-function contextSub(lines: string[], idx: number, fileSubs: ReadonlySet<string>, subs: readonly string[]): string | undefined {
+function contextSub(lines: string[], idx: number, col: number, fileSubs: ReadonlySet<string>, subs: readonly string[]): string | undefined {
   if (fileSubs.size === 1) return [...fileSubs][0];
-  for (let i = idx; i >= 0; i--) {
+  const own = mentionsAt(lines[idx]!, subs);
+  const before = own.filter((m) => m.at < col);
+  if (before.length) return before.at(-1)!.sub;
+  if (own.length) return own[0]!.sub;
+  if (/^#{1,2}\s/.test(lines[idx]!)) return undefined;
+  for (let i = idx - 1; i >= 0; i--) {
     const found = mentions(lines[i]!, subs);
     if (found.length) return found.at(-1);
     if (/^#{1,2}\s/.test(lines[i]!)) break;
@@ -93,7 +102,7 @@ export function checkPaths(repo: string, file: string, text: string, ignore: Rea
       const inSubs = subs.some(tracked);
       if (!inRoot && !inOwn && !inSubs) continue; // yol değil (ör. `a/b` oranı, paket adı)
       if (existsSync(join(repo, path)) || (own != null && existsSync(join(repo, own, path)))) continue;
-      const ctx = ownSub ?? contextSub(lines, idx, fileSubs, subs);
+      const ctx = ownSub ?? contextSub(lines, idx, m.index!, fileSubs, subs);
       if (ctx ? existsSync(join(repo, ctx, path)) : !inRoot && inSubs) continue; // yalnız alt projede anlamlı ve hangisi belli değil: bilinemez
       findings.push({ file, line: idx + 1, path: m[1]! });
     }

@@ -64,3 +64,37 @@ test("alt projeye göreli yol: kendi belgesinde, tek alt projeli belgede ve böl
     rmSync(r, { recursive: true, force: true });
   }
 });
+
+test("aynı satırda yoldan önce anılan alt proje, sonra anılanın önüne geçer", () => {
+  const r = mkdtempSync(join(tmpdir(), "sutlac-check-line-"));
+  const w = (rel: string, text: string) => {
+    mkdirSync(join(r, rel, ".."), { recursive: true });
+    writeFileSync(join(r, rel), text);
+  };
+  try {
+    w("docs/config.json", "{}");
+    w("apps/admin/CLAUDE.md", "");
+    w("apps/admin/shared/users.ts", "");
+    w("apps/admin/migrations/1.sql", "");
+    w("packages/auth/CLAUDE.md", "");
+    w("packages/auth/src/x.ts", "");
+    w(
+      "docs/knowledge/a.md",
+      [
+        // Önce anılan apps/admin: shared/users.ts orada var, sondaki packages/auth bağlamı değiştirmez.
+        "`apps/admin/migrations/1.sql` yorumu `shared/users.ts` der; kod `packages/auth` altında.",
+        // Yoldan önce alt proje yok: aynı satırda sonra anılan ilk alt proje bağlamdır.
+        "`shared/yok.ts` dosyası `apps/admin` içinde aranır.",
+        // Önce anılan packages/auth'ta yok: bulgu.
+        "`packages/auth` içindeki `shared/users.ts` yok.",
+      ].join("\n"),
+    );
+    const { findings } = runCheck(r, "docs");
+    expect(findings.map((f) => `${f.file}:${f.line} ${f.path}`)).toEqual([
+      "docs/knowledge/a.md:2 shared/yok.ts",
+      "docs/knowledge/a.md:3 shared/users.ts",
+    ]);
+  } finally {
+    rmSync(r, { recursive: true, force: true });
+  }
+});
